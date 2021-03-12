@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import ListCard from './ListCard';
 
 const mapListName = (name) => {
-    if(name === 'Discarded') return 'discadedList'
+    if(name === 'Discarded') return 'discardedList'
     if(name === 'Plots') return 'plotsHand'
     else if (name === 'Dead') return 'deadList'
 }

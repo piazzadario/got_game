@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { Button, Col, Row } from 'react-bootstrap';
 import CardItem from './components/PlaceCard';
@@ -18,6 +18,7 @@ import GoldPow from './components/GoldPow';
 import { HandContext } from './provider/HandContext';
 import ModalList from './components/ModalList';
 import PlotList from './components/PlotList';
+import Hand from './components/Hand';
 
 
 const TYPES = {
@@ -97,7 +98,8 @@ class App extends React.Component {
       let newList = [...state[from]];
       newList.splice(indexOfDiscarded, 1)
       return { [from]: newList, discardedList: discarded }
-    })
+    },()=>localStorage.setItem('hand',this.state.hand))
+
   }
 
   killChar = (id) => {
@@ -118,7 +120,7 @@ class App extends React.Component {
       let newHand = state.hand.concat(drawnCard);
       console.log(state.deck.length, tmpDeck.length)
       return { hand: newHand, deck: tmpDeck }
-    })
+    },()=>localStorage.setItem('hand',this.state.hand))
 
   }
 
@@ -154,13 +156,14 @@ class App extends React.Component {
   }
 
   returnToHand = (id, from) => {
+    console.log(from)
     this.setState(state => {
       let newHand = state.hand.concat(id);
       let indexOfDiscarded = state[from].indexOf(id)
       let newList = [...state[from]];
       newList.splice(indexOfDiscarded, 1)
       return { [from]: newList, hand: newHand }
-    })
+    },()=>localStorage.setItem('hand',this.state.hand))
   }
 
   render() {
@@ -173,81 +176,92 @@ class App extends React.Component {
 
     return (
       <HandContext.Provider value={value}>
-        {this.state.faction ? <div className='p-3'>
-          <Row >
-            <Col sm={7}>
-              <Row >
-                {this.state.chars.length >= 0 &&
-                  this.state.chars.map(c =>
-                    <Col sm={3} key={c}>
-                      <CharacterCard id={c}
-                        onDiscard={() => this.discardCard(c, FROMARRAY.Chars)}
-                        onKill={() => this.killChar(c)}
-                        onReturnToHand={() => this.returnToHand(c, FROMARRAY.Chars)}>
-                      </CharacterCard>
+        <Switch>
+          <Route exact path='/'>
 
-                    </Col>)}
+            {this.state.faction ? <div className='p-3'>
+              <Row >
+                <Col sm={7}>
+                  <Row >
+                    {this.state.chars.length >= 0 &&
+                      this.state.chars.map(c =>
+                        <Col sm={3} key={c}>
+                          <CharacterCard id={c}
+                            onDiscard={() => this.discardCard(c, FROMARRAY.Chars)}
+                            onKill={() => this.killChar(c)}
+                            onReturnToHand={() => this.returnToHand(c, FROMARRAY.Chars)}>
+                          </CharacterCard>
+
+                        </Col>)}
+                  </Row>
+                  <Row>
+                    {this.state.places.length >= 0 &&
+                      this.state.places.map(c =>
+                        <Col sm={3} key={c}>
+                          <PlaceCard id={c}
+                            onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
+                            onReturnToHand={() => this.returnToHand(c, FROMARRAY.Places)}>
+                          </PlaceCard>
+
+                        </Col>)}
+                  </Row>
+                </Col>
+
+                <Col sm={5}>
+                  <Row >
+                    <Col sm={5}>
+                      <FactionCard faction={this.state.faction}></FactionCard>
+                    </Col>
+                    <GoldPow></GoldPow>
+                    <Col sm={5}>
+                      <PlotCard items={this.state.pastPlots}></PlotCard>
+                    </Col>
+                  </Row>
+                  <Row sm={6}>
+                    <Col sm={4}>
+                      <Deck cards={this.state.deck} drawCard={() => this.drawCard()}></Deck>
+                    </Col>
+                    <Col sm={4}>
+                      <DiscardedList items={this.state.discardedList}
+                      ></DiscardedList>
+                    </Col>
+                    <Col sm={4}>
+                      <DeadList items={this.state.deadList}></DeadList>
+                    </Col>
+                  </Row>
+                </Col>
               </Row>
+              <Button variant='secondary' onClick={() => { localStorage.setItem('hand',this.state.hand); window.open('/hand') }}>SHOW HAND</Button>
+
               <Row>
-                {this.state.places.length >= 0 &&
-                  this.state.places.map(c =>
-                    <Col sm={3} key={c}>
-                      <PlaceCard id={c}
-                        onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
-                        onReturnToHand={() => this.returnToHand(c, FROMARRAY.Places)}>
-                      </PlaceCard>
+                <Col sm={8}>
+                  {this.state.hand.length !== 0 &&
 
-                    </Col>)}
-              </Row>
-            </Col>
-
-            <Col sm={5}>
-              <Row >
-                <Col sm={5}>
-                  <FactionCard faction={this.state.faction}></FactionCard>
-                </Col>
-                <GoldPow></GoldPow>
-                <Col sm={5}>
-                  <PlotCard items={this.state.pastPlots}></PlotCard>
-                </Col>
-              </Row>
-              <Row sm={6}>
-                <Col sm={4}>
-                  <Deck cards={this.state.deck} drawCard={() => this.drawCard()}></Deck>
+                    <Row>
+                      {this.state.hand.map(c =>
+                        <Col className='handCard' sm={1} key={c}>
+                          <HandCard id={c} hidden={true} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)} onPlayCard={() => this.onPlayCard(c)}>
+                          </HandCard>
+                        </Col>)}
+                    </Row>}
                 </Col>
                 <Col sm={4}>
-                  <DiscardedList items={this.state.discardedList}
-                  ></DiscardedList>
-                </Col>
-                <Col sm={4}>
-                  <DeadList items={this.state.deadList}></DeadList>
+                  <PlotList items={this.state.plotsHand} />
                 </Col>
               </Row>
-            </Col>
-          </Row>
-          <Row>
-
-            <Col sm={8}>
-              {this.state.hand.length !== 0 &&
-                this.state.hand.map(c =>
-                  <Col className='handCard' sm={1} key={c}>
-                    <HandCard id={c} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)} onPlayCard={() => this.onPlayCard(c)}>
-                    </HandCard>
-
-                  </Col>)}
-            </Col>
-            <Col>
-              <PlotList items={this.state.plotsHand}/>
-            </Col>
-          </Row>
-        </div> :
-          <Row className='align-items-center justify-content-around' style={{ width: '100vw', height: '100vh' }}>
-            <Button onClick={() => this.setState({ faction: 'bar', deck: shuffle(Decks.BarNig.cards), plotsHand: Decks.BarNig.plots })}>Baratheon/Guardiani</Button>
-            <Button onClick={() => this.setState({ faction: 'sta', deck: shuffle(Decks.StaGre.cards), plotsHand: Decks.StaGre.plots })}>Stark/Greyjoy</Button>
-            <Button onClick={() => this.setState({ faction: 'lan', deck: shuffle(Decks.LanTyr.cards), plotsHand: Decks.LanTyr.plots })}>Lannister/Tyrell</Button>
-            <Button onClick={() => this.setState({ faction: 'tar', deck: shuffle(Decks.TarMar.cards), plotsHand: Decks.TarMar.plots })}>Targaryen/Martell</Button>
-          </Row>
-        }
+            </div> :
+              <Row className='align-items-center justify-content-around' style={{ width: '100vw', height: '100vh' }}>
+                <Button onClick={() => this.setState({ faction: 'bar', deck: shuffle(Decks.BarNig.cards), plotsHand: Decks.BarNig.plots })}>Baratheon/Guardiani</Button>
+                <Button onClick={() => this.setState({ faction: 'sta', deck: shuffle(Decks.StaGre.cards), plotsHand: Decks.StaGre.plots })}>Stark/Greyjoy</Button>
+                <Button onClick={() => this.setState({ faction: 'lan', deck: shuffle(Decks.LanTyr.cards), plotsHand: Decks.LanTyr.plots })}>Lannister/Tyrell</Button>
+                <Button onClick={() => this.setState({ faction: 'tar', deck: shuffle(Decks.TarMar.cards), plotsHand: Decks.TarMar.plots })}>Targaryen/Martell</Button>
+              </Row>
+            }
+          </Route>
+          <Route exact path='/hand'>
+            <Hand></Hand>
+          </Route>
+        </Switch>
       </HandContext.Provider >
 
     );
