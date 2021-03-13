@@ -1,12 +1,6 @@
 
 // https://thronesdb.com/ 
 const cardUrl = 'https://thronesdb.com/api/public/card/01';
-const TYPES = {
-    'Character': 'character',
-    'Location': 'location',
-    'Attachment': 'attachment'
-}
-
 
 const getCardData = async function(id) {
     let cardId = id;

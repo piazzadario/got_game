@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import { Button, Col, Row } from 'react-bootstrap';
-import CardItem from './components/PlaceCard';
 import { Switch } from 'react-router';
 import { withRouter, Route } from 'react-router-dom';
 import HandCard from './components/HandCard';
@@ -16,16 +15,23 @@ import PlaceCard from './components/PlaceCard';
 import Decks from './decks';
 import GoldPow from './components/GoldPow';
 import { HandContext } from './provider/HandContext';
-import ModalList from './components/ModalList';
 import PlotList from './components/PlotList';
 import Hand from './components/Hand';
+import EventDialog from './components/EventDialog';
+import AttachmentDialog from './components/AttachmentDialog';
+
+const AttachmentAction = {
+  Discard: 'discard',
+  ToHand: 'toHand'
+}
 
 
 const TYPES = {
   'Character': 'character',
   'Location': 'location',
   'Attachment': 'attachment',
-  'Plot': 'plot'
+  'Plot': 'plot',
+  'Event': 'event'
 }
 
 const FROMARRAY = {
@@ -63,17 +69,21 @@ class App extends React.Component {
     super(props);
     this.state = {
       hand: [],
-      deck: null,
+      deck: [],
       discardedList: [],
       deadList: [],
       plotsHand: [],
       pastPlots: [],
       chars: [],
+      // chars: [{charId: '91', attachments: ['33','191']}],
       places: [],
       golds: 0,
       power: 0,
       modalList: FROMARRAY.Discarded,
-      faction: null
+      faction: null, //reset
+      showEventDialog: false,
+      eventDialogCard: null,
+      attachmentCard: null
     }
   }
 
@@ -92,14 +102,26 @@ class App extends React.Component {
 
 
   discardCard = (id, from) => {
-    this.setState(state => {
-      let discarded = state.discardedList.concat(id);
-      let indexOfDiscarded = state[from].indexOf(id)
-      let newList = [...state[from]];
-      newList.splice(indexOfDiscarded, 1)
-      return { [from]: newList, discardedList: discarded }
-    },()=>localStorage.setItem('hand',this.state.hand))
+    // console.log(from);
+    if(from !== FROMARRAY.Chars){
 
+      this.setState(state => {
+        let discarded = state.discardedList.concat(id);
+        let indexOfDiscarded = state[from].indexOf(id)
+        let newList = [...state[from]];
+        newList.splice(indexOfDiscarded, 1)
+        return { [from]: newList, discardedList: discarded }
+      },()=>localStorage.setItem('hand',this.state.hand))
+    }else{
+      this.setState(state => {
+        console.log(id)
+        let discarded = state.discardedList.concat(id);
+        let indexOfDiscarded = state.chars.map(c => c.charId).indexOf(id)
+        let newList = [...state.chars];
+        newList.splice(indexOfDiscarded, 1)
+        return {chars: newList, discardedList: discarded }
+      },()=>localStorage.setItem('hand',this.state.hand))
+    }
   }
 
   killChar = (id) => {
@@ -121,15 +143,15 @@ class App extends React.Component {
       console.log(state.deck.length, tmpDeck.length)
       return { hand: newHand, deck: tmpDeck }
     },()=>localStorage.setItem('hand',this.state.hand))
-
   }
+
+  
 
   onPlayCard = async (id) => {
     let card = await API.getCardData(id);
-    console.log(card)
     if (card.type_code === TYPES.Character) {
       this.setState(state => {
-        let newCharsList = state.chars.concat(id);
+        let newCharsList = state.chars.concat({charId: id, attachments: []});
         let indexOfDiscarded = state.hand.indexOf(id)
         let newHand = [...state.hand];
         newHand.splice(indexOfDiscarded, 1)
@@ -153,10 +175,64 @@ class App extends React.Component {
         return { plotsHand: newPlotsHand, pastPlots: newPastPlotsList }
       })
     }
+    if (card.type_code === TYPES.Event) {
+      this.setState({showEventDialog: true,eventDialogCard: id})
+    }
+    if (card.type_code === TYPES.Attachment) {
+      console.log('attachment:', id)
+      this.setState({attachmentCard: id})
+    }
+  }
+
+  handleEventCard = (id) => {
+    console.log('EVENT: ',id)
+    this.discardCard(id, FROMARRAY.Hand);
+    this.setState({eventDialogCard: null, showEventDialog: false})
+  }
+
+  handleAttachmentDialog = (targetId) => {
+    const attachmentCard = this.state.attachmentCard
+    if(!targetId){
+      this.setState({attachmentCard: null})
+    }else{
+      let chars = [...this.state.chars]
+      let targetIndex = chars.map(c=>c.charId).indexOf(targetId);
+      console.log(targetIndex)
+      if(!chars[targetIndex].attachments){
+        chars[targetIndex].attachments = [attachmentCard]
+      }else{
+        let newAttachmentsList = chars[targetIndex].attachments.concat(attachmentCard)
+        chars[targetIndex].attachments = newAttachmentsList
+      }
+      let newHand = [...this.state.hand];
+      let indexOfDiscarded = this.state.hand.indexOf(targetId)
+      newHand.splice(indexOfDiscarded, 1)
+      this.setState({attachmentCard: null, chars: chars, hand: newHand})
+    }
+  }
+
+  attachmentAction = (attachmentId,charId,action) =>{
+    this.setState(state => {
+      // update status of characters
+      let indexOfChar = state.chars.map(c => c.charId).indexOf(charId)
+      let char = state.chars.find(c => c.charId === charId)
+      let newAttachmentsList  = [...char.attachments].filter(a => a !== attachmentId);
+      let newChars = [...state.chars];
+      newChars[indexOfChar].attachments = newAttachmentsList;
+      
+      // update hand/discarded
+      let newList;
+      if(action === AttachmentAction.Discard){
+        newList = state.discardedList.concat(attachmentId);
+        return {chars: newChars, discardedList: newList};
+      }else{
+        newList = state.hand.concat(attachmentId);
+        return {chars: newChars, hand: newList};
+      }
+    })
   }
 
   returnToHand = (id, from) => {
-    console.log(from)
     this.setState(state => {
       let newHand = state.hand.concat(id);
       let indexOfDiscarded = state[from].indexOf(id)
@@ -166,12 +242,24 @@ class App extends React.Component {
     },()=>localStorage.setItem('hand',this.state.hand))
   }
 
+  returnToDeck= (id) => {
+    this.setState(state => {
+      let newDeck = state.deck.concat(id);
+      let indexOfDiscarded = state.hand.indexOf(id)
+      let newHand = [...state.hand];
+      newHand.splice(indexOfDiscarded, 1)
+      return { hand: newHand, deck: newDeck }
+    },()=>localStorage.setItem('hand',this.state.hand))
+  }
+
   render() {
 
     const value = {
       hand: this.state.hand,
       returnToHand: this.returnToHand,
-      playPlot: this.onPlayCard
+      playPlot: this.onPlayCard,
+      addAttachment: this.handleAttachmentDialog
+      
     }
 
     return (
@@ -185,11 +273,12 @@ class App extends React.Component {
                   <Row >
                     {this.state.chars.length >= 0 &&
                       this.state.chars.map(c =>
-                        <Col sm={3} key={c}>
-                          <CharacterCard id={c}
-                            onDiscard={() => this.discardCard(c, FROMARRAY.Chars)}
-                            onKill={() => this.killChar(c)}
-                            onReturnToHand={() => this.returnToHand(c, FROMARRAY.Chars)}>
+                        <Col sm={3} key={c.charId}>
+                          <CharacterCard char={c}
+                            onDiscard={() => this.discardCard(c.charId, FROMARRAY.Chars)}
+                            onKill={() => this.killChar(c.charId)}
+                            onReturnToHand={() => this.returnToHand(c.charId, FROMARRAY.Chars)}
+                            handleAttachment={this.attachmentAction}>
                           </CharacterCard>
 
                         </Col>)}
@@ -219,7 +308,7 @@ class App extends React.Component {
                   </Row>
                   <Row sm={6}>
                     <Col sm={4}>
-                      <Deck cards={this.state.deck} drawCard={() => this.drawCard()}></Deck>
+                      <Deck cards={this.state.deck} drawCard={() => this.drawCard()} shuffle={()=>this.setState({deck: shuffle(this.state.deck)})}></Deck>
                     </Col>
                     <Col sm={4}>
                       <DiscardedList items={this.state.discardedList}
@@ -240,7 +329,9 @@ class App extends React.Component {
                     <Row>
                       {this.state.hand.map(c =>
                         <Col className='handCard' sm={1} key={c}>
-                          <HandCard id={c} hidden={true} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)} onPlayCard={() => this.onPlayCard(c)}>
+                          <HandCard id={c} hidden={true} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)} 
+                            onPlayCard={() => this.onPlayCard(c)} onReturnToDeck={()=>this.returnToDeck(c)}>
+                            
                           </HandCard>
                         </Col>)}
                     </Row>}
@@ -257,6 +348,9 @@ class App extends React.Component {
                 <Button onClick={() => this.setState({ faction: 'tar', deck: shuffle(Decks.TarMar.cards), plotsHand: Decks.TarMar.plots })}>Targaryen/Martell</Button>
               </Row>
             }
+            <EventDialog card={this.state.eventDialogCard} show={this.state.showEventDialog} onHide={()=> {this.handleEventCard(this.state.eventDialogCard)}}/>
+            <AttachmentDialog charactersList={this.state.chars} attachment={this.state.attachmentCard}
+              show={this.state.attachmentCard!== null} onHide={()=> {this.handleAttachmentDialog(null)}}/>
           </Route>
           <Route exact path='/hand'>
             <Hand></Hand>
