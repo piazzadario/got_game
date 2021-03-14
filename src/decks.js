@@ -196,7 +196,7 @@ const Decks = {
 
     // lannister - tyrell
     LanTyr: {
-        cards: [
+        /* cards: [
             84,
             85,
             86,
@@ -245,8 +245,8 @@ const Decks = {
             34,
             44,
             28
-        ],
-        /* cards: [
+        ], */
+        cards: [
             95,
             96,//
             97,
@@ -264,7 +264,7 @@ const Decks = {
             191,//
             33,//
             34,//
-        ], */
+        ],
         plots: [
             // trame
             3,
