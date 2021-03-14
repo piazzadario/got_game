@@ -18,7 +18,7 @@ const CharacterCard = (props) => {
 
 
     return (
-        <Col sm={2} style={{ position: 'relative', display: 'table' }} className='mb-1'>
+        <Col sm={3} style={{ position: 'relative', display: 'table' }} className='mb-1'>
             <div onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onClick={() => setKneed(!isKneed)} style={{ position: 'relative', zIndex: '20' }}>
                 <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${char.charId}.jpg`} className={isKneed ? 'kneed' : ''} style={{ maxWidth: '100%', maxHeight: '100%' }} alt='teste'></img>
                 <Row className='mb-1 p-0' style={{ height: '35px', position: 'absolute', top: '0%', left: '40%', zIndex: '999'}}>
@@ -32,7 +32,7 @@ const CharacterCard = (props) => {
                         <Col >
                             <Button variant='secondary' className='px-2 py-0' onClick={props.onDiscard}>DISCARD</Button><br></br>
                             <Button variant='danger' className='px-2 py-0' onClick={props.onKill}>KILL</Button><br></br>
-                            <Button variant='warning' className='px-2 py-0' onClick={props.onReturnToHand}>HAND</Button>
+                            <Button variant='warning' className='px-2 py-0' onClick={props.onReturnToHand}>HAND</Button><br></br>
                             <Button variant='success' className='px-2 py-0' onClick={(ev)=>{props.onShowCardInfo(char.charId);ev.stopPropagation()}}>INFO</Button>
                         </Col>
                     </Row>}

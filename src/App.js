@@ -23,7 +23,7 @@ import AddCardForm from './components/AddCardForm';
 import SelectFaction from './components/SelectFaction';
 import CardInfoDialog from './components/CardInfoDialog';
 
-const DEBUG = true;
+const DEBUG = false;
 
 const AttachmentAction = {
   Discard: 'discard',
