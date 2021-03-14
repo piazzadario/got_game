@@ -1,14 +1,15 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
+import { Col } from 'react-bootstrap';
 // https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_198A.jpg --- from 198 to 205
 const factionCodes = {
-    bar: '198',
-    gre: '199',
-    lan: '200',
-    mar: '201',
-    nig: '202',
-    sta: '203',
-    tar: '204',
-    tyr: '205'
+    BarNig: '198',
+    // gre: '199',
+    LanTyr: '200',
+    // mar: '201',
+    // nig: '202',
+    StaGre: '203',
+    TarMar: '204',
+    // tyr: '205'
 };
 
 const FactionCard = (props) => {
@@ -18,9 +19,11 @@ const FactionCard = (props) => {
     const [isKneed, setKneed] = useState(false);
 
     return (
-        <div className='m-1' onClick={()=>setKneed(!isKneed)}>
-            <img style={{maxWidth: '65%', maxHeight:'100%'}} className={isKneed? 'kneed': ''} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${code}A.jpg`} alt='teste'></img>
-        </div>
+        <Col sm={5} >
+            <div className='m-1' onClick={() => setKneed(!isKneed)}>
+                <img style={{ maxWidth: '65%', maxHeight: '100%' }} className={isKneed ? 'kneed' : ''} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${code}A.jpg`} alt='teste'></img>
+            </div>
+        </Col>
     );
 }
 

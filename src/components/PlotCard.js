@@ -1,5 +1,5 @@
 import React from 'react';
-import {Badge} from 'react-bootstrap';
+import {Badge,Col} from 'react-bootstrap';
 
 const PlotCard = (props) => {
 
@@ -9,15 +9,15 @@ const PlotCard = (props) => {
     const lastid = items[length - 1]
 
     return (
-        <>
+        <Col sm={5}>
             {length > 0 ? <div style={{ width: '100%' }}>
                 <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${lastid}.jpg`} alt='teste'></img>
-                <Badge style={{ position: 'absolute', top: '0', right: '0' }} variant='secondary' >{length}</Badge>
+                <p className="w3-badge w3-large w3-padding w3-blue"  style={{ position: 'absolute',right:'5%', zIndex: '3' }}>{length}</p> 
             </div>
             : <div style={{ border: '2px dashed black', height: '100%', textAlign: 'center' }}>
             <p style={{ position: 'relative', top: '50%' }}>NO PLOTS PLAYED</p>
         </div>}
-        </>
+        </Col>
     );
 }
 

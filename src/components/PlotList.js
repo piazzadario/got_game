@@ -21,7 +21,7 @@ const PlotList = (props) => {
                     <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${lastid}.jpg`} alt='teste'>
 
                     </img>
-                    <Badge style={{ position: 'absolute', top: '0', right: '0' }} variant='secondary' >{length}</Badge>
+                    <p className="w3-badge w3-large w3-padding w3-blue"  style={{ position: 'absolute',right:'15%', zIndex: '3' }}>{length}</p> 
                     {items.length > 0 && <Col style={{ position: 'absolute', top: '10%', left: '10%', zIndex: '3', width: '100%' }}>
                         <Col >
                             <Button variant='primary' onClick={handleShow}>SHOW LIST</Button>
