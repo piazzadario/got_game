@@ -1,7 +1,7 @@
 // https://www.picclickimg.com/d/l400/pict/383447897333_/A-Game-Of-Thrones-LCG-2nd-Edition.jpg
 
 import React, { useState } from 'react';
-import { Badge, Button, Col } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 
 const Deck = (props) => {

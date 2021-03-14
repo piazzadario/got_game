@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Button } from 'react-bootstrap';
 import '../custom.css';
 import { HandContext } from '../provider/HandContext';
 

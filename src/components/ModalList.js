@@ -11,7 +11,6 @@ const mapListName = (name) => {
 
 const ModalList = (props) => {
     const items = props.items;
-    const lenght = items.lenght;
 
     let FROM = mapListName(props.listName);
 
