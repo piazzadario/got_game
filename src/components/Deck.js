@@ -18,7 +18,7 @@ const Deck = (props) => {
             </img>
             <p className="w3-badge w3-xxlarge w3-padding w3-green" style={{ position: 'absolute', right: '35%', top: '35%' }}>{length}</p>
 
-            {isMenuVisible && <Button variant='secondary' style={{ position: 'absolute', top: '10%', left: '30%' }} onClick={props.onDiscard}>SHUFFLE</Button>
+            {isMenuVisible && <Button variant='secondary' style={{ position: 'absolute', top: '10%', left: '30%' }} onClick={props.shuffle}>SHUFFLE</Button>
             }
         </div>
     );
