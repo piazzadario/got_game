@@ -19,7 +19,7 @@ const AttachmentChar = (props) => {
                     <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} style={{ zIndex: '2' }} alt='teste'></img>
                     {isMenuVisible &&
                         <Button className='ml-1' variant='warning' style={{ maxHeight: '100px' }} 
-                        onClick={()=>context.addAttachment(id)}>ATTACH</Button>
+                        onClick={()=>props.onAttach()}>ATTACH</Button>
                     }
                 </Row>}
         </HandContext.Consumer>

@@ -68,7 +68,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      hand: [182,183,184],
+      hand: [182, 183, 184],
       // deck: [],
       deck: Decks.LanTyr.cards,
       discardedList: [],
@@ -77,7 +77,7 @@ class App extends React.Component {
       pastPlots: [],
       //chars: [],
       chars: [
-        { charId: '91', attachments: ['33', '191'] }, 
+        { charId: '91', attachments: ['33', '191'] },
         { charId: '84', attachments: [] },
         { charId: '187', attachments: [] },
         { charId: '188', attachments: [] },
@@ -197,14 +197,14 @@ class App extends React.Component {
     this.setState({ eventDialogCard: null, showEventDialog: false })
   }
 
-  handleAttachmentDialog = (targetId) => {
+  handleAttachmentDialog = (attachmentId,targetId) => {
     const attachmentCard = this.state.attachmentCard
     if (!targetId) {
       this.setState({ attachmentCard: null })
     } else {
       let chars = [...this.state.chars]
       let targetIndex = chars.map(c => c.charId).indexOf(targetId);
-      console.log(targetIndex)
+      // console.log(targetIndex)
       if (!chars[targetIndex].attachments) {
         chars[targetIndex].attachments = [attachmentCard]
       } else {
@@ -212,8 +212,8 @@ class App extends React.Component {
         chars[targetIndex].attachments = newAttachmentsList
       }
       let newHand = [...this.state.hand];
-      let indexOfDiscarded = this.state.hand.indexOf(targetId)
-      newHand.splice(indexOfDiscarded, 1)
+      let indexOfPlayed = this.state.hand.indexOf(attachmentId)
+      newHand.splice(indexOfPlayed, 1)
       this.setState({ attachmentCard: null, chars: chars, hand: newHand }, () => localStorage.setItem('hand', this.state.hand))
     }
   }
@@ -277,18 +277,14 @@ class App extends React.Component {
             {this.state.faction ? <div className='p-3'>
               <Row >
                 <Col sm={7}>
-                  <Row >
-                    {this.state.chars.length >= 0 &&
-                      this.state.chars.map(c =>
-                        <Col sm={2} key={c.charId}  >
-                          <CharacterCard char={c}
-                            onDiscard={() => this.discardCard(c.charId, FROMARRAY.Chars)}
-                            onKill={() => this.killChar(c.charId)}
-                            onReturnToHand={() => this.returnToHand(c.charId, FROMARRAY.Chars)}
-                            handleAttachment={this.attachmentAction}>
-                          </CharacterCard>
-
-                        </Col>)}
+                  <Row>
+                    {this.state.chars.map(c =>
+                      <CharacterCard char={c} key={c.charId}
+                        onDiscard={() => this.discardCard(c.charId, FROMARRAY.Chars)}
+                        onKill={() => this.killChar(c.charId)}
+                        onReturnToHand={() => this.returnToHand(c.charId, FROMARRAY.Chars)}
+                        handleAttachment={this.attachmentAction}>
+                      </CharacterCard>)}
                   </Row>
                   <Row>
                     {this.state.places.length >= 0 &&
@@ -334,9 +330,9 @@ class App extends React.Component {
                   {this.state.hand.length !== 0 &&
 
                     <Row >
-                      {this.state.hand.map((c,idx) =>
+                      {this.state.hand.map((c, idx) =>
                         <Col className='handCard m-1' sm={2} key={c} >
-                          <HandCard id={c} idx={idx+1} hidden={true} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
+                          <HandCard id={c} idx={idx + 1} hidden={true} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
                             onPlayCard={() => this.onPlayCard(c)} onReturnToDeck={() => this.returnToDeck(c)}>
 
                           </HandCard>
@@ -357,6 +353,7 @@ class App extends React.Component {
             }
             <EventDialog card={this.state.eventDialogCard} show={this.state.showEventDialog} onHide={() => { this.handleEventCard(this.state.eventDialogCard) }} />
             <AttachmentDialog charactersList={this.state.chars} attachment={this.state.attachmentCard}
+              onAttach={this.handleAttachmentDialog}
               show={this.state.attachmentCard !== null} onHide={() => { this.handleAttachmentDialog(null) }} />
           </Route>
           <Route exact path='/hand'>

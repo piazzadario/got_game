@@ -7,7 +7,7 @@ import AttachmentChar from './AttachmentChar';
 const AttachmentDialog = (props) => {
     const charactersList = props.charactersList;
     const attachmentId = props.attachment;
-
+    const onAttach = props.onAttach;
 
     return (
         <Modal show={props.show} onHide={props.onHide}>
@@ -17,7 +17,7 @@ const AttachmentDialog = (props) => {
             <Modal.Body>
                 <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${attachmentId}.jpg`} style={{ maxWidth: '100%', maxHeight: '100%', zIndex: '2' }} alt='teste'></img>
                 {charactersList.map(c => 
-                    <AttachmentChar key={c} id={c.charId}/>
+                    <AttachmentChar key={c} id={c.charId} onAttach={()=>onAttach(attachmentId,c.charId)}/>
                     )}
             </Modal.Body>
             <Modal.Footer>
