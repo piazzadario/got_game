@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button, Col, Row, Form } from 'react-bootstrap';
 import { Switch } from 'react-router';
 import { withRouter, Route } from 'react-router-dom';
 import HandCard from './components/HandCard';
@@ -19,6 +19,8 @@ import PlotList from './components/PlotList';
 import Hand from './components/Hand';
 import EventDialog from './components/EventDialog';
 import AttachmentDialog from './components/AttachmentDialog';
+import AddCardForm from './components/AddCardForm';
+
 
 const AttachmentAction = {
   Discard: 'discard',
@@ -197,7 +199,7 @@ class App extends React.Component {
     this.setState({ eventDialogCard: null, showEventDialog: false })
   }
 
-  handleAttachmentDialog = (attachmentId,targetId) => {
+  handleAttachmentDialog = (attachmentId, targetId) => {
     const attachmentCard = this.state.attachmentCard
     if (!targetId) {
       this.setState({ attachmentCard: null })
@@ -259,8 +261,15 @@ class App extends React.Component {
     }, () => localStorage.setItem('hand', this.state.hand))
   }
 
-  render() {
+  addCardToHand= (id)=>{
+    console.log('ADDED: ',id)
+    this.setState(state => {
+      let newHand = state.hand.concat(id);
+      return {hand: newHand }
+    }, () => localStorage.setItem('hand', this.state.hand))
+  }
 
+  render() {
     const value = {
       hand: this.state.hand,
       returnToHand: this.returnToHand,
@@ -323,7 +332,12 @@ class App extends React.Component {
                   </Row>
                 </Col>
               </Row>
-              <Button variant='secondary' onClick={() => { localStorage.setItem('hand', this.state.hand); window.open('/hand') }}>SHOW HAND</Button>
+              <Row className='align-items-center'>
+                <Col sm={3}>
+                  <Button variant='secondary' onClick={() => { localStorage.setItem('hand', this.state.hand); window.open('/hand') }}>{`SHOW HAND (${this.state.hand.length})`}</Button>
+                </Col>
+                <AddCardForm onAddPressed={this.addCardToHand}/>
+              </Row>
 
               <Row>
                 <Col sm={8}>

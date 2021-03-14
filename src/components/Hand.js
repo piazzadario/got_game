@@ -19,45 +19,17 @@ class Hand extends React.Component{
 
     render(){
         return (
-            <>
-        
+            <Col sm={10}>
                 <Row>
-                    {this.state.hand.map(c =>
-                        <Col className='handCard' sm={1} key={c}>
-                            <HandCard id={c} hidden={false}>
+                    {this.state.hand.map((c,idx) =>
+                        <Col className='handCard' sm={2} key={c}>
+                            <HandCard id={c} hidden={false} idx={idx+1}> 
                             </HandCard>
                         </Col>)}
                 </Row>
-            </>
+            </Col>
         );
     }
 }
 
 export default Hand;
-
-
-/* const Hand = () => {
-    const [hand, setHand] = useState(
-        localStorage.getItem('hand').split(',') || []
-    );
-
-    useEffect(() => {
-        localStorage.setItem('hand', hand);
-    }, [hand]);
-
-
-    return (
-        <>
-    
-            <Row>
-                {hand.map(c =>
-                    <Col className='handCard' sm={1} key={c}>
-                        <HandCard id={c} hidden={false}>
-                        </HandCard>
-                    </Col>)}
-            </Row>
-        </>
-    );
-};
-
-export default Hand; */
