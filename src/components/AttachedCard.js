@@ -17,10 +17,10 @@ const AttachedCard = (props) => {
                 className={isKneed ? 'kneed' : ''}
                 src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${attachmentId}.jpg`}
                 alt='teste'></img>
-            {attachmentVisible  && <Col style={{ position: 'absolute', top: '10%', left: '20%', zIndex: '3', width: '100%' }}>
-                <Button className='mb-1 px-2 py-0' variant='secondary' onClick={() => props.onDiscard()}>DISCARD</Button>
-                <Button className='mb-1 px-2 py-0' variant='warning' onClick={() => props.onToHand()}>HAND</Button>
-                <Button className='px-2 py-0' variant='success' className='px-2 py-0' onClick={(ev)=>{props.onShowCardInfo(attachmentId); ev.stopPropagation()}}>INFO</Button>
+            {attachmentVisible  && <Col style={{ position: 'absolute', top: '10%', left: '40%', zIndex: '3', width: '100%' }}>
+                <Button className='mb-1 px-2 py-0' variant='secondary' onClick={() => props.onDiscard()}>DISCARD</Button><br></br>
+                <Button className='mb-1 px-2 py-0' variant='warning' onClick={() => props.onToHand()}>HAND</Button><br></br>
+                <Button className='px-2 py-0' variant='success' onClick={(ev)=>{props.onShowCardInfo(attachmentId); ev.stopPropagation()}}>INFO</Button>
             </Col>}
         </div>
     );

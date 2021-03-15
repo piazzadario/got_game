@@ -22,7 +22,7 @@ const CharacterCard = (props) => {
             <div onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onClick={() => setKneed(!isKneed)} style={{ position: 'relative', zIndex: '20' }}>
                 <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${char.charId}.jpg`} className={isKneed ? 'kneed' : ''} style={{ maxWidth: '100%', maxHeight: '100%' }} alt='teste'></img>
                 <Row className='mb-1 p-0' style={{ height: '35px', position: 'absolute', top: '0%', left: '40%', zIndex: '999'}}>
-                    <Button variant='secondary' onClick={(ev) => {setPower(powerPoints - 1);ev.stopPropagation()}} hidden={!isMenuVisible}>-</Button>
+                    <Button variant='secondary' onClick={(ev) => {if(powerPoints) setPower(powerPoints - 1);ev.stopPropagation()}} hidden={!isMenuVisible}>-</Button>
                     <p className="w3-badge w3-large w3-blue" >{powerPoints}</p>
                     <Button variant='primary' onClick={(ev) => {setPower(powerPoints + 1);ev.stopPropagation()}} hidden={!isMenuVisible}>+</Button>
                 </Row>

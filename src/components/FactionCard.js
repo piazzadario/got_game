@@ -19,9 +19,9 @@ const FactionCard = (props) => {
     const [isKneed, setKneed] = useState(false);
 
     return (
-        <Col sm={5} >
+        <Col sm={4} >
             <div className='m-1' onClick={() => setKneed(!isKneed)}>
-                <img style={{ maxWidth: '65%', maxHeight: '100%' }} className={isKneed ? 'kneed' : ''} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${code}A.jpg`} alt='teste'></img>
+                <img style={{ maxWidth: '100%', maxHeight: '100%' }} className={isKneed ? 'kneed' : ''} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${code}A.jpg`} alt='teste'></img>
             </div>
         </Col>
     );

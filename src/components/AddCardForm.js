@@ -7,18 +7,16 @@ const AddCardForm = (props) => {
 
 
     return (
-        <Col sm={9}>
+        <Col sm={7}>
             <Form>
                 <Row className='align-items-center'>
-                    <Col sm={3}>
+                    <Col>
                         <Form.Group >
                             <Form.Label>Add a card to hand:</Form.Label>
                             <Form.Control type='number' placeholder="ex. 167" value={cardId} onChange={(ev)=>setCardId(ev.target.value)} />
                         </Form.Group>
                     </Col>
-                    <Col sm={3}>
-                        <Button variant="primary" onClick={()=>{props.onAddPressed(cardId); setCardId(0)}}>ADD</Button>
-                    </Col>
+                        <Button variant="primary m-2" onClick={()=>{props.onAddPressed(cardId); setCardId(0)}}>ADD</Button>
                 </Row>
             </Form>
         </Col>

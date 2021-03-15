@@ -6,8 +6,6 @@ import { withRouter, Route } from 'react-router-dom';
 import HandCard from './components/HandCard';
 import FactionCard from './components/FactionCard';
 import PlotCard from './components/PlotCard';
-import DiscardedList from './components/DiscardedList';
-import DeadList from './components/DeadList';
 import Deck from './components/Deck';
 import API from './api';
 import CharacterCard from './components/CharacterCard';
@@ -15,15 +13,14 @@ import PlaceCard from './components/PlaceCard';
 import Decks from './decks';
 import GoldPow from './components/GoldPow';
 import { HandContext } from './provider/HandContext';
-import PlotList from './components/PlotList';
 import Hand from './components/Hand';
-import EventDialog from './components/EventDialog';
 import AttachmentDialog from './components/AttachmentDialog';
 import AddCardForm from './components/AddCardForm';
 import SelectFaction from './components/SelectFaction';
 import CardInfoDialog from './components/CardInfoDialog';
+import Pile from './components/Pile';
 
-const DEBUG = false;
+const DEBUG = true;
 
 const AttachmentAction = {
   Discard: 'discard',
@@ -73,14 +70,14 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      hand: DEBUG ? [182, 183, 184] : [],
+      hand: DEBUG ? [197,182, 183, 184] : [],
       // hand: [182, 183, 184],
       deck: DEBUG ? Decks.LanTyr.cards : [],
       // deck: Decks.LanTyr.cards,
-      discardedList: [],
-      deadList: [],
+      discardedList: [179,180],
+      deadList: [91,98],
       plotsHand: DEBUG? Decks.LanTyr.plots  :[],
-      pastPlots: [],
+      pastPlots: [2,3],
       chars: DEBUG ?
         [{ charId: '91', attachments: ['33', '191'] },
         { charId: '84', attachments: [] },
@@ -94,7 +91,6 @@ class App extends React.Component {
       modalList: FROMARRAY.Discarded,
       faction: DEBUG ? 'LanTyr' : null,
       // faction: 'lan',
-      showEventDialog: false,
       eventDialogCard: null,
       attachmentCard: null,
       infoCard: null
@@ -116,6 +112,8 @@ class App extends React.Component {
 
 
   discardCard = (id, from) => {
+
+    console.log(id)
     if (from !== FROMARRAY.Chars) {
       this.setState(state => {
         let discarded = state.discardedList.concat(id);
@@ -160,6 +158,7 @@ class App extends React.Component {
 
 
   onPlayCard = async (id) => {
+    console.log(id)
     let card = await API.getCardData(id);
     if (card.type_code === TYPES.Character) {
       this.setState(state => {
@@ -188,7 +187,7 @@ class App extends React.Component {
       }, () => localStorage.setItem('hand', this.state.hand))
     }
     if (card.type_code === TYPES.Event) {
-      this.setState({ showEventDialog: true, eventDialogCard: id })
+      this.setState({ eventDialogCard: id })
     }
     if (card.type_code === TYPES.Attachment) {
       this.setState({ attachmentCard: id })
@@ -196,9 +195,8 @@ class App extends React.Component {
   }
 
   handleEventCard = (id) => {
-    console.log('EVENT: ', id)
     this.discardCard(id, FROMARRAY.Hand);
-    this.setState({ eventDialogCard: null, showEventDialog: false })
+    this.setState({ eventDialogCard: null })
   }
 
   handleAttachmentDialog = (attachmentId, targetId) => {
@@ -264,7 +262,6 @@ class App extends React.Component {
   }
 
   addCardToHand = (id) => {
-    console.log('ADDED: ', id)
     this.setState(state => {
       let newHand = state.hand.concat(id);
       return { hand: newHand }
@@ -289,7 +286,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/'>
 
-            {this.state.faction ? <div className='p-3'>
+            {this.state.faction ? <div className='m-3'>
               <Row >
                 <Col sm={7}>
                   <Row>
@@ -321,48 +318,41 @@ class App extends React.Component {
                     <PlotCard items={this.state.pastPlots}/>
                   </Row>
                   <Row sm={6}>
-                    <Col sm={4}>
                       <Deck cards={this.state.deck} drawCard={() => this.drawCard()} shuffle={() => this.setState({ deck: shuffle(this.state.deck) })}></Deck>
-                    </Col>
-                    <Col sm={4}>
-                      <DiscardedList items={this.state.discardedList} />
-                    </Col>
-                    <Col sm={4}>
-                      <DeadList items={this.state.deadList}></DeadList>
-                    </Col>
+                      <Pile items={this.state.discardedList} listType={'Discarded'}/>
+                      <Pile items={this.state.deadList} listType={'Dead'}></Pile>
                   </Row>
                 </Col>
               </Row>
-              <Row className='align-items-center'>
-                <Col sm={3}>
+              <Col sm={8}>
+              <Row className='align-items-center mb-1' style={{border: '2px solid black', display:'inline-flex'}}>
+                <Col sm={5}>
                   <Button variant='secondary' onClick={() => { localStorage.setItem('hand', this.state.hand); window.open('/hand') }}>{`SHOW HAND (${this.state.hand.length})`}</Button>
                 </Col>
                 <AddCardForm onAddPressed={this.addCardToHand} />
               </Row>
+              </Col>
 
               <Row>
-                <Col sm={8}>
-                  {this.state.hand.length !== 0 &&
-
-                    <Row >
+                <Col  sm={9}>
+                    <Row className='px-3'>
                       {this.state.hand.map((c, idx) =>
-                        <Col className='handCard m-1' sm={2} key={c} >
+                        <Col className='handCard p-0' sm={2} key={c} >
                           <HandCard id={c} idx={idx + 1} hidden={true} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
                             onPlayCard={() => this.onPlayCard(c)} onReturnToDeck={() => this.returnToDeck(c)}>
 
                           </HandCard>
                         </Col>)}
-                    </Row>}
+                    </Row>
                 </Col>
-                <Col sm={4}>
-                  <PlotList items={this.state.plotsHand} />
-                </Col>
+                  <Pile items={this.state.plotsHand} listType={'Plots'}/>
               </Row>
             </div> :
               <SelectFaction onSelectFaction={this.selectFaction} />
             }
-            <EventDialog card={this.state.eventDialogCard} show={this.state.showEventDialog} onHide={() => { this.handleEventCard(this.state.eventDialogCard) }} />
-            <CardInfoDialog card={this.state.infoCard} show={this.state.infoCard} onHide={() =>  this.showCardInfo(null) } />
+
+            <CardInfoDialog card={this.state.eventDialogCard} show={this.state.eventDialogCard !== null} type={'Event'} onHide={() => this.handleEventCard(this.state.eventDialogCard) } />
+            <CardInfoDialog card={this.state.infoCard} show={this.state.infoCard !== null} type={'Card'} onHide={() =>  this.showCardInfo(null) } />
             <AttachmentDialog charactersList={this.state.chars} attachment={this.state.attachmentCard}
               onAttach={this.handleAttachmentDialog}
               show={this.state.attachmentCard !== null} onHide={() => { this.handleAttachmentDialog(null) }} />

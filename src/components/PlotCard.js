@@ -1,5 +1,5 @@
 import React from 'react';
-import {Badge,Col} from 'react-bootstrap';
+import {Col} from 'react-bootstrap';
 
 const PlotCard = (props) => {
 
