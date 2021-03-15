@@ -20,7 +20,7 @@ import SelectFaction from './components/SelectFaction';
 import CardInfoDialog from './components/CardInfoDialog';
 import Pile from './components/Pile';
 
-const DEBUG = true;
+const DEBUG = false;
 
 const AttachmentAction = {
   Discard: 'discard',
@@ -74,10 +74,10 @@ class App extends React.Component {
       // hand: [182, 183, 184],
       deck: DEBUG ? Decks.LanTyr.cards : [],
       // deck: Decks.LanTyr.cards,
-      discardedList: [179,180],
-      deadList: [91,98],
+      discardedList: DEBUG? [179,180] : [],
+      deadList: DEBUG? [91,98] : [],
       plotsHand: DEBUG? Decks.LanTyr.plots  :[],
-      pastPlots: [2,3],
+      pastPlots: DEBUG? [2,3]: [],
       chars: DEBUG ?
         [{ charId: '91', attachments: ['33', '191'] },
         { charId: '84', attachments: [] },
