@@ -5,7 +5,6 @@ import { Switch } from 'react-router';
 import { withRouter, Route } from 'react-router-dom';
 import HandCard from './components/HandCard';
 import FactionCard from './components/FactionCard';
-import PlotCard from './components/PlotCard';
 import Deck from './components/Deck';
 import API from './api';
 import CharacterCard from './components/CharacterCard';
@@ -20,7 +19,7 @@ import SelectFaction from './components/SelectFaction';
 import CardInfoDialog from './components/CardInfoDialog';
 import Pile from './components/Pile';
 
-const DEBUG = false;
+const DEBUG = true;
 
 const AttachmentAction = {
   Discard: 'discard',
@@ -85,7 +84,7 @@ class App extends React.Component {
         { charId: '188', attachments: [] },
         { charId: '94', attachments: [] },
         { charId: '95', attachments: [] }] : [],
-      places: [],
+      places: DEBUG? [97,98]:[],
       golds: 0,
       power: 0,
       modalList: FROMARRAY.Discarded,
@@ -272,12 +271,27 @@ class App extends React.Component {
     this.setState({ faction: faction, deck: shuffle(Decks[faction].cards), plotsHand: Decks[faction].plots })
   }
 
+  returnToPlots = (id) => {
+    this.setState(state => {
+      let newPlotsHand = state.plotsHand.concat(id);
+      let indexOfReturned = state.pastPlots.indexOf(id);
+      let newList = [...state.pastPlots];
+      newList.splice(indexOfReturned, 1)
+      return { pastPlots: newList, plotsHand: newPlotsHand }
+    })
+  }
+
+  shuffleHand= () => {
+    this.setState({hand: shuffle(this.state.hand)},()=>localStorage.setItem('hand', this.state.hand))
+  }
+
   render() {
     const value = {
       hand: this.state.hand,
       returnToHand: this.returnToHand,
       playPlot: this.onPlayCard,
-      addAttachment: this.handleAttachmentDialog
+      addAttachment: this.handleAttachmentDialog,
+      returnToPlots: this.returnToPlots
 
     }
 
@@ -291,23 +305,23 @@ class App extends React.Component {
                 <Col sm={7}>
                   <Row>
                     {this.state.chars.map(c =>
-                      <CharacterCard char={c} key={c.charId}
+                      <CharacterCard card={c} key={c.charId}
                         onDiscard={() => this.discardCard(c.charId, FROMARRAY.Chars)}
                         onKill={() => this.killChar(c.charId)}
                         onShowCardInfo={this.showCardInfo}
+                        isChar={true}
                         onReturnToHand={() => this.returnToHand(c.charId, FROMARRAY.Chars)}
                         handleAttachment={this.attachmentAction}>
                       </CharacterCard>)}
                   </Row>
                   <Row>
                     {this.state.places.map(c =>
-                      <Col sm={3} key={c}>
-                        <PlaceCard id={c}
+                        <CharacterCard card={c} key={c} 
+                          isChar={false}
                           onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
+                          onShowCardInfo={this.showCardInfo}
                           onReturnToHand={() => this.returnToHand(c, FROMARRAY.Places)}>
-                        </PlaceCard>
-
-                      </Col>)}
+                        </CharacterCard>)}
                   </Row>
                 </Col>
 
@@ -315,7 +329,7 @@ class App extends React.Component {
                   <Row >
                     <FactionCard faction={this.state.faction} />
                     <GoldPow />
-                    <PlotCard items={this.state.pastPlots}/>
+                    <Pile items={this.state.pastPlots} listType={'Past plots'}/>
                   </Row>
                   <Row sm={6}>
                       <Deck cards={this.state.deck} drawCard={() => this.drawCard()} shuffle={() => this.setState({ deck: shuffle(this.state.deck) })}></Deck>
@@ -324,10 +338,13 @@ class App extends React.Component {
                   </Row>
                 </Col>
               </Row>
-              <Col sm={8}>
+              <Col sm={10}>
               <Row className='align-items-center mb-1' style={{border: '2px solid black', display:'inline-flex'}}>
-                <Col sm={5}>
-                  <Button variant='secondary' onClick={() => { localStorage.setItem('hand', this.state.hand); window.open('/hand') }}>{`SHOW HAND (${this.state.hand.length})`}</Button>
+                <Col >
+                  <Button variant='info' onClick={() => this.shuffleHand()}>{`SHUFFLE (${this.state.hand.length})`}</Button>
+                </Col>
+                <Col>
+                  <Button variant='secondary' onClick={() => { localStorage.setItem('hand', this.state.hand); window.open('/hand') }}>{`SHOW (${this.state.hand.length})`}</Button>
                 </Col>
                 <AddCardForm onAddPressed={this.addCardToHand} />
               </Row>
@@ -348,6 +365,7 @@ class App extends React.Component {
                   <Pile items={this.state.plotsHand} listType={'Plots'}/>
               </Row>
             </div> :
+              
               <SelectFaction onSelectFaction={this.selectFaction} />
             }
 

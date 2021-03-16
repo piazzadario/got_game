@@ -7,7 +7,7 @@ const AddCardForm = (props) => {
 
 
     return (
-        <Col sm={7}>
+        <Col sm={6}>
             <Form>
                 <Row className='align-items-center'>
                     <Col>

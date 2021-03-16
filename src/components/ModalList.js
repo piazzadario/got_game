@@ -6,6 +6,7 @@ import ListCard from './ListCard';
 const mapListName = (name) => {
     if(name === 'Discarded') return 'discardedList'
     if(name === 'Plots') return 'plotsHand'
+    if(name === 'Past plots') return 'pastPlots'
     else if (name === 'Dead') return 'deadList'
 }
 
@@ -20,7 +21,7 @@ const ModalList = (props) => {
                 <Modal.Title>{`${props.listName} list`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {items.map(c => <ListCard id={c} fromArray={FROM}></ListCard>)}
+                {items.map(c => <ListCard id={c} key={c} fromArray={FROM}></ListCard>)}
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={props.onHide}>

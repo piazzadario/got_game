@@ -1,3 +1,5 @@
+const DEBUG = false;
+
 const Decks = {
 
     //Stark/Greyjoy
@@ -196,7 +198,7 @@ const Decks = {
 
     // lannister - tyrell
     LanTyr: {
-        /* cards: [
+        cards: !DEBUG ? [
             84,
             85,
             86,
@@ -245,8 +247,7 @@ const Decks = {
             34,
             44,
             28
-        ], */
-        cards: [
+        ] : [
             95,
             96,//
             97,

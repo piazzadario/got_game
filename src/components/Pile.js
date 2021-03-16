@@ -17,7 +17,7 @@ const Pile = (props) => {
 
 
     return (
-        <Col sm={listType==='Plots' ? 3: 4}>
+        <Col sm={listType==='Plots' ? 3: (listType==='Past plots'? 0: 4) }>
             {length > 0 ?
                 <div className='m-1'>
                     <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${lastid}.jpg`} alt='teste'>

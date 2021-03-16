@@ -9,18 +9,17 @@ const PlaceCard = (props) => {
     const [isMenuVisible, setVisible] = useState(false);
 
     return (
+        <Col sm={3} >
         <div style={{ width: '100%' }} onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onClick={() => setKneed(!isKneed)}>
             <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} className={isKneed ? 'kneed' : ''} style={{ maxWidth: '100%', maxHeight: '100%', zIndex: '2' }} alt='teste'></img>
-            {isMenuVisible && <Col style={{ position: 'absolute', top: '10%', left: '30%', zIndex: '3', width: '100%' }}>
-                <Col className='mb-1' >
-                    <Button variant='secondary' onClick={props.onDiscard}>DISCARD</Button>
-                </Col>
-                <Col>
-                    <Button variant='warning' onClick={props.onReturnToHand}>HAND</Button>
-                </Col>
+            {isMenuVisible && <div className='card-options'>
+                    <Button variant='secondary' className='py-0 mb-1' onClick={props.onDiscard}>DISCARD</Button>
+                    <Button variant='warning' className='py-0 mb-1' onClick={props.onReturnToHand}>HAND</Button>
+                    <Button variant='success' className='py-0' onClick={(ev)=>{props.onShowCardInfo(id);ev.stopPropagation()}}>INFO</Button>
 
-            </Col>}
+            </div>}
         </div>
+        </Col>
     );
 }
 

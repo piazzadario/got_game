@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Button } from 'react-bootstrap';
+import { Row, Button, Col } from 'react-bootstrap';
 import '../custom.css';
 import { HandContext } from '../provider/HandContext';
 
@@ -7,18 +7,27 @@ const ListCard = (props) => {
 
     const id = props.id;
     const [isMenuVisible, setVisible] = useState(false);
+    const fromArray = props.fromArray
 
 
     return (
         <HandContext.Consumer>
 
             {(context) =>
-                <Row onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className='align-items-center'>
-
-                    <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} style={{ zIndex: '2' }} alt='teste'></img>
+                <Row onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className='align-items-center pl-3'>
+                    <Col sm={9}>
+                        <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} style={{ zIndex: '2', maxWidth: '100%' }} alt='teste'></img>
+                    </Col>
                     {isMenuVisible &&
-                        <Button className='ml-1' variant='warning' style={{ maxHeight: '100px' }} 
-                        onClick={()=> props.fromArray==='plotsHand'? context.playPlot(id,props.fromArray)  : context.returnToHand(id,props.fromArray)}>{props.fromArray==='plotsHand'? 'PLAY' : 'TO HAND'}</Button>
+                        <Col sm={3}>
+                            <Button  variant='warning' style={{ maxHeight: '100px', maxWidth: '100%' }}
+                                onClick={() => {
+                                    if (fromArray === 'plotsHand') return context.playPlot(id, fromArray);
+                                    if (fromArray === 'pastPlots') return context.returnToPlots(id);
+                                    else return context.returnToHand(id, fromArray)
+                                }
+                                }>{fromArray === 'plotsHand' ? 'PLAY' : 'TO HAND'}</Button>
+                        </Col>
                     }
                 </Row>}
         </HandContext.Consumer>
