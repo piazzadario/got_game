@@ -14,7 +14,7 @@ const ListCard = (props) => {
         <HandContext.Consumer>
 
             {(context) =>
-                <Row onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className='align-items-center pl-3'>
+                <Row onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className='align-items-center pl-3 m-1'>
                     <Col sm={9}>
                         <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} style={{ zIndex: '2', maxWidth: '100%' }} alt='teste'></img>
                     </Col>

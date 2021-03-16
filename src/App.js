@@ -7,8 +7,7 @@ import HandCard from './components/HandCard';
 import FactionCard from './components/FactionCard';
 import Deck from './components/Deck';
 import API from './api';
-import CharacterCard from './components/CharacterCard';
-import PlaceCard from './components/PlaceCard';
+import PlayedCard from './components/PlayedCard';
 import Decks from './decks';
 import GoldPow from './components/GoldPow';
 import { HandContext } from './provider/HandContext';
@@ -305,23 +304,23 @@ class App extends React.Component {
                 <Col sm={7}>
                   <Row>
                     {this.state.chars.map(c =>
-                      <CharacterCard card={c} key={c.charId}
+                      <PlayedCard card={c} key={c.charId}
                         onDiscard={() => this.discardCard(c.charId, FROMARRAY.Chars)}
                         onKill={() => this.killChar(c.charId)}
                         onShowCardInfo={this.showCardInfo}
                         isChar={true}
                         onReturnToHand={() => this.returnToHand(c.charId, FROMARRAY.Chars)}
                         handleAttachment={this.attachmentAction}>
-                      </CharacterCard>)}
+                      </PlayedCard>)}
                   </Row>
                   <Row>
                     {this.state.places.map(c =>
-                        <CharacterCard card={c} key={c} 
+                        <PlayedCard card={c} key={c} 
                           isChar={false}
                           onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
                           onShowCardInfo={this.showCardInfo}
                           onReturnToHand={() => this.returnToHand(c, FROMARRAY.Places)}>
-                        </CharacterCard>)}
+                        </PlayedCard>)}
                   </Row>
                 </Col>
 

@@ -8,7 +8,7 @@ const AttachmentAction = {
     ToHand: 'toHand'
 }
 
-const CharacterCard = (props) => {
+const PlayedCard = (props) => {
 
     const card = props.card;
     const isChar = props.isChar;
@@ -50,4 +50,4 @@ const CharacterCard = (props) => {
     );
 }
 
-export default CharacterCard;
+export default PlayedCard;

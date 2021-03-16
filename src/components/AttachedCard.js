@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  Col, Button } from 'react-bootstrap';
+import {  Button } from 'react-bootstrap';
 import '../custom.css';
 
 

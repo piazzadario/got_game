@@ -6,7 +6,7 @@ const GoldPow = (props) => {
   const [gold, setGold] = useState(0);
   const [power, setPower] = useState(0);
   return (
-    <Col sm={3}>
+    <Col sm={3} className='pile-card'>
       <div className='py-1 px-1 mb-2' style={{ border: '1px solid black', width: '100%' }}>
         <p style={{ fontWeight: 'bold' }}>{`ORO: x${gold}`}</p>
         <Row className='justify-content-around'>
