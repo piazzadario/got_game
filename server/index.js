@@ -23,5 +23,10 @@ io.on('connection', (socket) => {
     socket.on('faction_selection', (faction) =>     {
         socket.broadcast.emit('faction_selection', faction );   
     });
+
+    socket.on('game', (gameState) =>     {
+        console.log(gameState);
+        socket.broadcast.emit('game', gameState );   
+    });
 });
 
