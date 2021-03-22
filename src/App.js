@@ -17,8 +17,23 @@ import AddCardForm from './components/AddCardForm';
 import SelectFaction from './components/SelectFaction';
 import CardInfoDialog from './components/CardInfoDialog';
 import Pile from './components/Pile';
+import {io} from 'socket.io-client';
 
-const DEBUG = true;
+const socket = io('http://localhost:3001');
+
+socket.on('connect',()=>{
+  console.log('Client id: ',socket.id)
+})
+
+socket.on('faction_selection', (faction) => {
+  console.log('Your opponent has selected: ',faction)
+});
+
+const notify_faction = (faction) =>{
+  socket.emit('faction_selection',faction);
+}
+
+const DEBUG = false;
 
 const AttachmentAction = {
   Discard: 'discard',
@@ -267,7 +282,8 @@ class App extends React.Component {
   }
 
   selectFaction = (faction) => {
-    this.setState({ faction: faction, deck: shuffle(Decks[faction].cards), plotsHand: Decks[faction].plots })
+    this.setState({ faction: faction, deck: shuffle(Decks[faction].cards), plotsHand: Decks[faction].plots },notify_faction(faction))
+
   }
 
   returnToPlots = (id) => {
