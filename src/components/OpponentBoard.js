@@ -7,32 +7,21 @@ import PlayedCard from './PlayedCard';
 import AddCardForm from './AddCardForm';
 import Pile from './Pile';
 import GoldPow from './GoldPow';
-import { FROMARRAY, AttachmentAction, TYPES, shuffle } from '../common/constants';
+import {FROMARRAY,AttachmentAction, TYPES, shuffle} from '../common/constants';
 import CardInfoDialog from './CardInfoDialog';
 import AttachmentDialog from './AttachmentDialog'
 import API from '../api'
-import OpponentHand from './OpponentHand'
-import { socket } from '../common/socket'
+import {socket} from '../common/socket'
 
 
 
-class Board extends React.Component {
+class OpponentBoard extends React.Component{
 
     constructor(props) {
         super(props);
         this.state = props.boardState;
-    }
-
-    componentDidMount() {
-        if (!this.props.owner) {
-            socket.on('game', (gameState) => {
-                console.log('New game state: ', gameState);
-                this.setState(gameState);
-            });
-        }
-    }
-
-
+      }
+    
     discardCard = (id, from) => {
 
         console.log(id)
@@ -43,8 +32,7 @@ class Board extends React.Component {
                 let newList = [...state[from]];
                 newList.splice(indexOfDiscarded, 1)
                 return { [from]: newList, discardedList: discarded }
-            }, () => socket.emit('game', this.state))
-                //}, () => localStorage.setItem('hand', this.state.hand))
+            }, () => localStorage.setItem('hand', this.state.hand))
         } else {
             this.setState(state => {
                 console.log(id)
@@ -53,8 +41,7 @@ class Board extends React.Component {
                 let newList = [...state.chars];
                 newList.splice(indexOfDiscarded, 1)
                 return { chars: newList, discardedList: discarded }
-            }, () => socket.emit('game', this.state))
-                //}, () => localStorage.setItem('hand', this.state.hand))
+            }, () => localStorage.setItem('hand', this.state.hand))
         }
     }
 
@@ -68,8 +55,7 @@ class Board extends React.Component {
                 let newHand = [...state.hand];
                 newHand.splice(indexOfDiscarded, 1)
                 return { hand: newHand, chars: newCharsList }
-            }, () => socket.emit('game', this.state))
-            //}, () => localStorage.setItem('hand', this.state.hand))
+            }, () => localStorage.setItem('hand', this.state.hand))
         } if (card.type_code === TYPES.Location) {
             this.setState(state => {
                 let newPlacesList = state.places.concat(id);
@@ -77,8 +63,7 @@ class Board extends React.Component {
                 let newHand = [...state.hand];
                 newHand.splice(indexOfDiscarded, 1)
                 return { hand: newHand, places: newPlacesList }
-            }, () => socket.emit('game', this.state))
-            //}, () => localStorage.setItem('hand', this.state.hand))
+            }, () => localStorage.setItem('hand', this.state.hand))
         }
         if (card.type_code === TYPES.Plot) {
             this.setState(state => {
@@ -87,20 +72,13 @@ class Board extends React.Component {
                 let newPlotsHand = [...state.plotsHand];
                 newPlotsHand.splice(indexOfDiscarded, 1)
                 return { plotsHand: newPlotsHand, pastPlots: newPastPlotsList }
-            }, () => socket.emit('game', this.state))
-            //}, () => localStorage.setItem('hand', this.state.hand))
+            }, () => localStorage.setItem('hand', this.state.hand))
         }
         if (card.type_code === TYPES.Event) {
-            this.setState({
-                eventDialogCard: id
-            }, () => socket.emit('game', this.state))
-            //})
+            this.setState({ eventDialogCard: id })
         }
         if (card.type_code === TYPES.Attachment) {
-            this.setState({
-                attachmentCard: id
-            }, () => socket.emit('game', this.state))
-            //})
+            this.setState({ attachmentCard: id })
         }
     }
 
@@ -111,8 +89,7 @@ class Board extends React.Component {
             let newChars = [...state.chars];
             newChars.splice(indexOfKilled, 1)
             return { chars: newChars, deadList: deads }
-        }, () => socket.emit('game', this.state))
-        //})
+        })
     }
     returnToHand = (id, from) => {
         this.setState(state => {
@@ -121,8 +98,7 @@ class Board extends React.Component {
             let newList = [...state[from]];
             newList.splice(indexOfReturned, 1)
             return { [from]: newList, hand: newHand }
-        }, () => socket.emit('game', this.state))
-        //}, () => localStorage.setItem('hand', this.state.hand))
+        }, () => localStorage.setItem('hand', this.state.hand))
     }
 
     returnToDeck = (id) => {
@@ -132,8 +108,7 @@ class Board extends React.Component {
             let newHand = [...state.hand];
             newHand.splice(indexOfDiscarded, 1)
             return { hand: newHand, deck: newDeck }
-        }, () => socket.emit('game', this.state))
-        //}, () => localStorage.setItem('hand', this.state.hand))
+        }, () => localStorage.setItem('hand', this.state.hand))
     }
 
     addCard = () => {
@@ -141,8 +116,7 @@ class Board extends React.Component {
             let id = state.cards.length + 1;
             const cardsList = state.cards.concat(id)
             return { cards: cardsList };
-        }, () => socket.emit('game', this.state))
-        //}, () => localStorage.setItem('hand', this.state.hand));
+        }, () => localStorage.setItem('hand', this.state.hand));
 
     }
 
@@ -154,9 +128,8 @@ class Board extends React.Component {
             let newHand = state.hand.concat(drawnCard);
             console.log(state.deck.length, tmpDeck.length)
             return { hand: newHand, deck: tmpDeck }
-        }, () => socket.emit('game', this.state))
-        //}, () => localStorage.setItem('hand', this.state.hand))
-
+        }, () => localStorage.setItem('hand', this.state.hand))
+        socket.emit('game', this.state);
     }
 
     handleEventCard = (id) => {
@@ -164,10 +137,6 @@ class Board extends React.Component {
         this.setState({ eventDialogCard: null })
     }
 
-    setGoldPow=(gold,pow)=>{
-        console.log(gold,pow)
-        this.setState({gold:gold,power:pow}, () => socket.emit('game', this.state))
-    }
 
     attachmentAction = (attachmentId, charId, action) => {
         this.setState(state => {
@@ -187,16 +156,14 @@ class Board extends React.Component {
                 newList = state.hand.concat(attachmentId);
                 return { chars: newChars, hand: newList };
             }
-        }, () => socket.emit('game', this.state))
-        //})
+        })
     }
 
     addCardToHand = (id) => {
         this.setState(state => {
             let newHand = state.hand.concat(id);
             return { hand: newHand }
-        }, () => socket.emit('game', this.state))
-            //}, () => localStorage.setItem('hand', this.state.hand))
+        }, () => localStorage.setItem('hand', this.state.hand))
 
     }
 
@@ -221,16 +188,13 @@ class Board extends React.Component {
             let newHand = [...this.state.hand];
             let indexOfPlayed = this.state.hand.indexOf(attachmentId)
             newHand.splice(indexOfPlayed, 1)
-            this.setState({ attachmentCard: null, chars: chars, hand: newHand 
-            }, () => socket.emit('game', this.state))
-            //}, () => localStorage.setItem('hand', this.state.hand))
+            this.setState({ attachmentCard: null, chars: chars, hand: newHand }, () => localStorage.setItem('hand', this.state.hand))
         }
     }
-
-    render() {
+    
+    render(){
         return (
             <>
-                {!this.props.owner && <OpponentHand hand={this.state.hand}/>}
                 <Row >
                     <Col sm={7}>
                         <Row>
@@ -254,11 +218,11 @@ class Board extends React.Component {
                                 </PlayedCard>)}
                         </Row>
                     </Col>
-
+    
                     <Col sm={5}>
                         <Row >
                             <FactionCard faction={this.state.faction} />
-                            <GoldPow owner={this.props.owner} gold={this.state.gold} power={this.state.power} setGoldPow={this.setGoldPow }/>
+                            <GoldPow />
                             <Pile items={this.state.pastPlots} listType={'Past plots'} />
                         </Row>
                         <Row sm={6}>
@@ -268,7 +232,7 @@ class Board extends React.Component {
                         </Row>
                     </Col>
                 </Row>
-                <Col sm={10} hidden={!this.props.owner}>
+                <Col sm={10}>
                     <Row className='align-items-center mb-1' style={{ border: '2px solid black', display: 'inline-flex' }}>
                         <Col >
                             <Button variant='info' onClick={() => this.shuffleHand()}>{`SHUFFLE (${this.state.hand.length})`}</Button>
@@ -279,15 +243,15 @@ class Board extends React.Component {
                         <AddCardForm onAddPressed={this.addCardToHand} />
                     </Row>
                 </Col>
-
-                <Row hidden={!this.props.owner}>
-                    <Col sm={7}>
+    
+                <Row>
+                    <Col sm={9}>
                         <Row className='px-3'>
                             {this.state.hand.map((c, idx) =>
                                 <Col className='handCard p-0' sm={2} key={c} >
-                                    <HandCard id={c} idx={idx + 1} hidden={!this.props.owner} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
+                                    <HandCard id={c} idx={idx + 1} hidden={true} onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
                                         onPlayCard={() => this.onPlayCard(c)} onReturnToDeck={() => this.returnToDeck(c)}>
-
+    
                                     </HandCard>
                                 </Col>)}
                         </Row>
@@ -297,11 +261,11 @@ class Board extends React.Component {
                 <CardInfoDialog card={this.state.eventDialogCard} show={this.state.eventDialogCard !== null} type={'Event'} onHide={() => this.handleEventCard(this.state.eventDialogCard)} />
                 <CardInfoDialog card={this.state.infoCard} show={this.state.infoCard !== null} type={'Card'} onHide={() => this.showCardInfo(null)} />
                 <AttachmentDialog charactersList={this.state.chars} attachment={this.state.attachmentCard}
-                    onAttach={this.handleAttachmentDialog}
-                    show={this.state.attachmentCard !== null} onHide={() => { this.handleAttachmentDialog(null) }} />
+                  onAttach={this.handleAttachmentDialog}
+                  show={this.state.attachmentCard !== null} onHide={() => { this.handleAttachmentDialog(null) }} />
             </>
         );
     }
-
+    
 }
-export default Board;
+export default OpponentBoard;

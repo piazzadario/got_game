@@ -18,8 +18,8 @@ const AttachedCard = (props) => {
                 src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${attachmentId}.jpg`}
                 alt='teste'></img>
             {attachmentVisible  && <div className='card-options'>
-                <Button className='mb-1 px-2 py-0' variant='secondary' onClick={() => props.onDiscard()}>DISCARD</Button>
-                <Button className='mb-1 px-2 py-0' variant='warning' onClick={() => props.onToHand()}>HAND</Button>
+                <Button className='mb-1 px-2 py-0' variant='secondary' onClick={() => props.onDiscard()} hidden={!props.owner}>DISCARD</Button>
+                <Button className='mb-1 px-2 py-0' variant='warning' onClick={() => props.onToHand()} hidden={!props.owner}>HAND</Button>
                 <Button className='py-0' variant='success' onClick={(ev)=>{props.onShowCardInfo(attachmentId); ev.stopPropagation()}}>INFO</Button>
             </div>}
         </div>

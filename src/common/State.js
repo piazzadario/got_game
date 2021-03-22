@@ -1,5 +1,5 @@
 class State {
-        constructor(hand, deck, discardedList, deadList, plotsHand, pastPlots, chars, places, golds, power, modalList, faction, eventDialogCard, attachmentCard, infoCard) {
+        constructor(hand, deck, discardedList, deadList, plotsHand, pastPlots, chars, places, gold, power, modalList, faction, eventDialogCard, attachmentCard, infoCard) {
                 if (!arguments.length) {
                         this.player=null;
                         this.hand = [];
@@ -10,7 +10,7 @@ class State {
                         this.pastPlots = [];
                         this.chars = [];
                         this.places = [];
-                        this.golds = 0;
+                        this.gold = 0;
                         this.power = 0;
                         this.modalList = 'discardedList';
                         this.faction = null;
@@ -28,7 +28,7 @@ class State {
                         this.pastPlots = pastPlots;
                         this.chars = chars;
                         this.places = places;
-                        this.golds = golds;
+                        this.gold = gold;
                         this.power = power;
                         this.modalList = modalList;
                         this.faction = faction;

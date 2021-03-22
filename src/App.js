@@ -5,24 +5,17 @@ import { withRouter, Route } from 'react-router-dom';
 import { HandContext } from './provider/HandContext';
 import Hand from './components/Hand';
 import SelectFaction from './components/SelectFaction';
-import {DEBUG,debugState, Decks,shuffle} from './common/constants';
+import { DEBUG, debugState, Decks, shuffle } from './common/constants';
 import Board from './components/Board';
 import State from './common/State';
-import {socket} from './common/socket'
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = DEBUG ? {me:debugState,opponent:debugState} : {me:State(),opponent:State()}
+    this.state = DEBUG ? { me: debugState, opponent: debugState } : { me: new State(), opponent:new State() }
   }
 
-  componentDidMount() {
-    socket.on('game', (gameState) => {
-      console.log('New game state: ', gameState)
-      this.setState(gameState);
-    });
-  }
 
   selectFaction = (faction) => {
     this.setState({ faction: faction, deck: shuffle(Decks[faction].cards), plotsHand: Decks[faction].plots })
@@ -59,8 +52,9 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/'>
             {this.state.faction ? <div className='m-3'>
-            <Board boardState={this.state.opponent}></Board>
-            <Board boardState={this.state.me}></Board>
+              <Board boardState={this.state.opponent} owner={false} />
+              <hr style={{borderTop: '3px solid black'}}></hr>
+              <Board boardState={this.state.me} owner={true} />
             </div> :
               <SelectFaction onSelectFaction={this.selectFaction} />
             }

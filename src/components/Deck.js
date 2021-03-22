@@ -13,7 +13,7 @@ const Deck = (props) => {
 
 
     return (
-        <Col sm={4} >
+        <Col sm={3} >
             <div className='m-1' style={{position:'relative',maxWidth:'100%'}} onMouseOver={() => setMenuVisible(true)} onMouseLeave={() => setMenuVisible(false)} >
                 <img style={{ maxWidth: '100%', maxHeight: '100%' }} onClick={() => props.drawCard()} src={`https://www.picclickimg.com/d/l400/pict/383447897333_/A-Game-Of-Thrones-LCG-2nd-Edition.jpg`} alt='teste'>
                 </img>
