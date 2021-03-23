@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import React from 'react';
+import { Row, Button } from 'react-bootstrap';
 
 const GoldPow = (props) => {
 

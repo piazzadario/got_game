@@ -6,18 +6,16 @@ import Deck from "./Deck";
 import PlayedCard from "./PlayedCard";
 import AddCardForm from "./AddCardForm";
 import Pile from "./Pile";
-import GoldPow from "./GoldPow";
 import {
   FROMARRAY,
   AttachmentAction,
   TYPES,
   shuffle,
-  Decks
+  Decks,
 } from "../common/constants";
 import CardInfoDialog from "./CardInfoDialog";
 import AttachmentDialog from "./AttachmentDialog";
 import API from "../api";
-import OpponentHand from "./OpponentHand";
 import { socket } from "../common/socket";
 import SelectFaction from "./SelectFaction";
 
@@ -27,16 +25,20 @@ class Board extends React.Component {
     this.state = props.boardState;
   }
 
-
   selectFaction = (faction) => {
-    let newMe = {...this.state.me}
-    newMe.faction= faction;
-    newMe.deck = shuffle(Decks[faction].cards);
-    newMe.plotsHand = Decks[faction].plots ;
+    const deck = shuffle(Decks[faction].cards);
+    const plotsHand = Decks[faction].plots;
 
-    this.setState({ faction: faction, deck: shuffle(Decks[faction].cards), plotsHand: Decks[faction].plots },() => socket.emit("game", this.state))
+    this.setState(
+      {
+        faction: faction,
+        deck: deck,
+        plotsHand: plotsHand,
+      },
+      () => socket.emit("game", this.state)
+    );
     // this.setState({me: newMe}, () => socket.emit("game", this.state))
-  }
+  };
 
   componentDidMount() {
     if (!this.props.owner) {
@@ -293,140 +295,149 @@ class Board extends React.Component {
   };
 
   render() {
-    return (
-      <>
-      {!this.state.faction? <SelectFaction onSelectFaction={this.selectFaction}/>
-        : 
+    if (!this.state.faction) {
+      console.log('No faction selected')
+      if (!this.props.owner) {
+        return <p>Waiting for opponent...</p>;
+      } else {
+        return <SelectFaction onSelectFaction={this.selectFaction} />;
+      }
+    } else {
+      return (
         <>
-        <Row>
-          <Col sm={8}>
-            <Row>
-              {this.state.chars.map((c) => (
-                <PlayedCard
-                  card={c}
-                  key={c.charId}
-                  owner={this.props.owner}
-                  onDiscard={() => this.discardCard(c.charId, FROMARRAY.Chars)}
-                  onKill={() => this.killChar(c.charId)}
-                  onShowCardInfo={this.showCardInfo}
-                  isChar={true}
-                  onReturnToHand={() =>
-                    this.returnToHand(c.charId, FROMARRAY.Chars)
-                  }
-                  handleAttachment={this.attachmentAction}
-                ></PlayedCard>
-              ))}
-            </Row>
-            <Row>
-              {this.state.places.map((c) => (
-                <PlayedCard
-                  card={c}
-                  key={c}
-                  isChar={false}
-                  onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
-                  onShowCardInfo={this.showCardInfo}
-                  onReturnToHand={() => this.returnToHand(c, FROMARRAY.Places)}
-                ></PlayedCard>
-              ))}
-            </Row>
-          </Col>
-
-          <Col sm={4}>
-            <Row className="mb-3">
-              <FactionCard faction={this.state.faction} owner={this.props.owner}
-                hand={this.state.hand.length}
-                gold={this.state.gold}
-                power={this.state.power}
-                setGoldPow={this.setGoldPow}/>
-              {/* <GoldPow
-                owner={this.props.owner}
-                gold={this.state.gold}
-                power={this.state.power}
-                setGoldPow={this.setGoldPow}
-              /> */}
-              <Pile items={this.state.pastPlots} listType={"Past plots"} />
-            </Row>
-            <Row sm={6} >
-              <Deck
-                cards={this.state.deck}
-                drawCard={() => this.drawCard()}
-                shuffle={() =>
-                  this.setState({ deck: shuffle(this.state.deck) })
-                }
-              ></Deck>
-              <Pile items={this.state.discardedList} listType={"Discarded"} />
-              <Pile items={this.state.deadList} listType={"Dead"}></Pile>
-            </Row>
-            <Col hidden={!this.props.owner} className='mt-2'>
-              <Row
-                className="align-items-center mb-1"
-                style={{ border: "2px solid black", display: "inline-flex" }}
-              >
-                <Col>
-                  <Button
-                    variant="info"
-                    onClick={() => this.shuffleHand()}
-                  >{`SHUFFLE (${this.state.hand.length})`}</Button>
-                </Col>
-                <Col>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      localStorage.setItem("hand", this.state.hand);
-                      window.open("/hand");
-                    }}
-                  >{`SHOW (${this.state.hand.length})`}</Button>
-                </Col>
-                <AddCardForm onAddPressed={this.addCardToHand} />
+          <Row>
+            <Col sm={8}>
+              <Row>
+                {this.state.chars.map((c) => (
+                  <PlayedCard
+                    card={c}
+                    key={c.charId}
+                    owner={this.props.owner}
+                    onDiscard={() =>
+                      this.discardCard(c.charId, FROMARRAY.Chars)
+                    }
+                    onKill={() => this.killChar(c.charId)}
+                    onShowCardInfo={this.showCardInfo}
+                    isChar={true}
+                    onReturnToHand={() =>
+                      this.returnToHand(c.charId, FROMARRAY.Chars)
+                    }
+                    handleAttachment={this.attachmentAction}
+                  ></PlayedCard>
+                ))}
+              </Row>
+              <Row>
+                {this.state.places.map((c) => (
+                  <PlayedCard
+                    card={c}
+                    key={c}
+                    isChar={false}
+                    onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
+                    onShowCardInfo={this.showCardInfo}
+                    onReturnToHand={() =>
+                      this.returnToHand(c, FROMARRAY.Places)
+                    }
+                  ></PlayedCard>
+                ))}
               </Row>
             </Col>
-          </Col>
-        </Row>
 
-        <Row hidden={!this.props.owner}>
-          <Col sm={7}>
-            <Row className="px-3">
-              {this.state.hand.map((c, idx) => (
-                <Col className="handCard p-0" sm={2} key={c}>
-                  <HandCard
-                    id={c}
-                    idx={idx + 1}
-                    hidden={!this.props.owner}
-                    onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
-                    onPlayCard={() => this.onPlayCard(c)}
-                    onReturnToDeck={() => this.returnToDeck(c)}
-                  ></HandCard>
-                </Col>
-              ))}
-            </Row>
-          </Col>
-          <Pile items={this.state.plotsHand} listType={"Plots"} />
-        </Row>
-        <CardInfoDialog
-          card={this.state.eventDialogCard}
-          show={this.state.eventDialogCard !== null}
-          type={"Event"}
-          onHide={() => this.handleEventCard(this.state.eventDialogCard)}
-        />
-        <CardInfoDialog
-          card={this.state.infoCard}
-          show={this.state.infoCard !== null}
-          type={"Card"}
-          onHide={() => this.showCardInfo(null)}
-        />
-        <AttachmentDialog
-          charactersList={this.state.chars}
-          attachment={this.state.attachmentCard}
-          onAttach={this.handleAttachmentDialog}
-          show={this.state.attachmentCard !== null}
-          onHide={() => {
-            this.handleAttachmentDialog(null);
-          }}
-        />
-      </>
-        }
-      </>
-    );
+            <Col sm={4}>
+              <Row className="mb-3">
+                <FactionCard
+                  faction={this.state.faction}
+                  owner={this.props.owner}
+                  hand={this.state.hand.length}
+                  gold={this.state.gold}
+                  power={this.state.power}
+                  setGoldPow={this.setGoldPow}
+                />
+                <Pile items={this.state.pastPlots} listType={"Past plots"} />
+              </Row>
+              <Row sm={6}>
+                <Deck
+                  owner={this.props.owner}
+                  cards={this.state.deck}
+                  drawCard={() => this.drawCard()}
+                  shuffle={() =>
+                    this.setState({ deck: shuffle(this.state.deck) })
+                  }
+                ></Deck>
+                <Pile items={this.state.discardedList} listType={"Discarded"} />
+                <Pile items={this.state.deadList} listType={"Dead"}></Pile>
+              </Row>
+              <Col hidden={!this.props.owner} className="mt-2">
+                <Row
+                  className="align-items-center mb-1"
+                  style={{
+                    border: "2px solid black",
+                    display: "inline-flex",
+                  }}
+                >
+                  <Col>
+                    <Button
+                      variant="info"
+                      onClick={() => this.shuffleHand()}
+                    >{`SHUFFLE (${this.state.hand.length})`}</Button>
+                  </Col>
+                  <Col>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        localStorage.setItem("hand", this.state.hand);
+                        window.open("/hand");
+                      }}
+                    >{`SHOW (${this.state.hand.length})`}</Button>
+                  </Col>
+                  <AddCardForm onAddPressed={this.addCardToHand} />
+                </Row>
+              </Col>
+            </Col>
+          </Row>
+
+          <Row hidden={!this.props.owner}>
+            <Col sm={7}>
+              <Row className="px-3">
+                {this.state.hand.map((c, idx) => (
+                  <Col className="handCard p-0" sm={2} key={c}>
+                    <HandCard
+                      id={c}
+                      idx={idx + 1}
+                      hidden={!this.props.owner}
+                      onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
+                      onPlayCard={() => this.onPlayCard(c)}
+                      onReturnToDeck={() => this.returnToDeck(c)}
+                    ></HandCard>
+                  </Col>
+                ))}
+              </Row>
+            </Col>
+            <Pile items={this.state.plotsHand} listType={"Plots"} />
+          </Row>
+          <CardInfoDialog
+            card={this.state.eventDialogCard}
+            show={this.state.eventDialogCard !== null}
+            type={"Event"}
+            onHide={() => this.handleEventCard(this.state.eventDialogCard)}
+          />
+          <CardInfoDialog
+            card={this.state.infoCard}
+            show={this.state.infoCard !== null}
+            type={"Card"}
+            onHide={() => this.showCardInfo(null)}
+          />
+          <AttachmentDialog
+            charactersList={this.state.chars}
+            attachment={this.state.attachmentCard}
+            onAttach={this.handleAttachmentDialog}
+            show={this.state.attachmentCard !== null}
+            onHide={() => {
+              this.handleAttachmentDialog(null);
+            }}
+          />
+        </>
+      );
+    }
   }
 }
 export default Board;

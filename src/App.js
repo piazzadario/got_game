@@ -4,11 +4,9 @@ import { Switch } from 'react-router';
 import { withRouter, Route } from 'react-router-dom';
 import { HandContext } from './provider/HandContext';
 import Hand from './components/Hand';
-import SelectFaction from './components/SelectFaction';
-import { DEBUG, debugState, Decks, shuffle } from './common/constants';
+import { DEBUG, debugState, shuffle } from './common/constants';
 import Board from './components/Board';
 import State from './common/State';
-import { socket } from "./common/socket";
 
 class App extends React.Component {
 
