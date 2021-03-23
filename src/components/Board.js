@@ -12,17 +12,30 @@ import {
   AttachmentAction,
   TYPES,
   shuffle,
+  Decks
 } from "../common/constants";
 import CardInfoDialog from "./CardInfoDialog";
 import AttachmentDialog from "./AttachmentDialog";
 import API from "../api";
 import OpponentHand from "./OpponentHand";
 import { socket } from "../common/socket";
+import SelectFaction from "./SelectFaction";
 
 class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = props.boardState;
+  }
+
+
+  selectFaction = (faction) => {
+    let newMe = {...this.state.me}
+    newMe.faction= faction;
+    newMe.deck = shuffle(Decks[faction].cards);
+    newMe.plotsHand = Decks[faction].plots ;
+
+    this.setState({ faction: faction, deck: shuffle(Decks[faction].cards), plotsHand: Decks[faction].plots },() => socket.emit("game", this.state))
+    // this.setState({me: newMe}, () => socket.emit("game", this.state))
   }
 
   componentDidMount() {
@@ -282,6 +295,9 @@ class Board extends React.Component {
   render() {
     return (
       <>
+      {!this.state.faction? <SelectFaction onSelectFaction={this.selectFaction}/>
+        : 
+        <>
         <Row>
           <Col sm={8}>
             <Row>
@@ -407,6 +423,8 @@ class Board extends React.Component {
             this.handleAttachmentDialog(null);
           }}
         />
+      </>
+        }
       </>
     );
   }
