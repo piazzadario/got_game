@@ -16,7 +16,6 @@ import {
 import CardInfoDialog from "./CardInfoDialog";
 import AttachmentDialog from "./AttachmentDialog";
 import API from "../api";
-import OpponentHand from "./OpponentHand";
 import { socket } from "../common/socket";
 
 class Board extends React.Component {
