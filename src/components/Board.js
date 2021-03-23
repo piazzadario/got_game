@@ -282,7 +282,6 @@ class Board extends React.Component {
   render() {
     return (
       <>
-        {!this.props.owner && <OpponentHand hand={this.state.hand} />}
         <Row>
           <Col sm={8}>
             <Row>
@@ -318,13 +317,17 @@ class Board extends React.Component {
 
           <Col sm={4}>
             <Row className="mb-3">
-              <FactionCard faction={this.state.faction} />
-              <GoldPow
+              <FactionCard faction={this.state.faction} owner={this.props.owner}
+                hand={this.state.hand.length}
+                gold={this.state.gold}
+                power={this.state.power}
+                setGoldPow={this.setGoldPow}/>
+              {/* <GoldPow
                 owner={this.props.owner}
                 gold={this.state.gold}
                 power={this.state.power}
                 setGoldPow={this.setGoldPow}
-              />
+              /> */}
               <Pile items={this.state.pastPlots} listType={"Past plots"} />
             </Row>
             <Row sm={6} >
