@@ -51,7 +51,7 @@ class App extends React.Component {
       <HandContext.Provider value={value}>
         <Switch>
           <Route exact path='/'>
-            {this.state.faction ? <div className='m-3'>
+            {this.state.faction ? <div className='mx-3 my-1'>
               <Board boardState={this.state.opponent} owner={false} />
               <hr style={{borderTop: '3px solid black'}}></hr>
               <Board boardState={this.state.me} owner={true} />

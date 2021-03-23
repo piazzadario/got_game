@@ -13,11 +13,11 @@ const Deck = (props) => {
 
 
     return (
-        <Col sm={3} >
+        <Col sm={4} >
             <div className='m-1' style={{position:'relative',maxWidth:'100%'}} onMouseOver={() => setMenuVisible(true)} onMouseLeave={() => setMenuVisible(false)} >
                 <img style={{ maxWidth: '100%', maxHeight: '100%' }} onClick={() => props.drawCard()} src={`https://www.picclickimg.com/d/l400/pict/383447897333_/A-Game-Of-Thrones-LCG-2nd-Edition.jpg`} alt='teste'>
                 </img>
-                <p className="w3-badge w3-xxlarge w3-padding w3-green deck-badge" >{length}</p>
+                <p className="w3-badge w3-xlarge w3-padding w3-green deck-badge" >{length}</p>
 
                 {isMenuVisible && <Button variant='secondary' className='deck-action' onClick={props.shuffle}>SHUFFLE</Button>
                 }

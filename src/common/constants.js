@@ -1,6 +1,6 @@
 import State from './State';
 
-export const DEBUG = false;
+export const DEBUG = true;
 
 export const AttachmentAction = {
   Discard: 'discard',
