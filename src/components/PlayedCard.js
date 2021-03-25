@@ -33,7 +33,7 @@ const PlayedCard = (props) => {
                             <Button variant='secondary' className=' py-0 mb-1' onClick={props.onDiscard} hidden={!props.owner}>DISCARD</Button>
                             <Button variant='danger' className=' py-0 mb-1' onClick={props.onKill} hidden={!isChar || !props.owner}>KILL</Button>
                             <Button variant='warning' className=' py-0 mb-1' onClick={props.onReturnToHand} hidden={!props.owner}>HAND</Button>
-                            <Button variant='success' className=' py-0' onClick={(ev) => { props.onShowCardInfo(id); ev.stopPropagation() }} >INFO</Button>
+                            <Button variant='info' className=' py-0' onClick={(ev) => { props.onShowCardInfo(id); ev.stopPropagation() }} >INFO</Button>
                         </div>
                 }
             </div>

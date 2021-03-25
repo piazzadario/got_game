@@ -18,6 +18,7 @@ import AttachmentDialog from "./AttachmentDialog";
 import API from "../api";
 import { socket } from "../common/socket";
 import SelectFaction from "./SelectFaction";
+import {HandContext} from '../provider/HandContext';
 
 class Board extends React.Component {
   constructor(props) {
@@ -50,7 +51,6 @@ class Board extends React.Component {
   }
 
   discardCard = (id, from) => {
-    console.log(id);
     if (from !== FROMARRAY.Chars) {
       this.setState(
         (state) => {
@@ -80,7 +80,6 @@ class Board extends React.Component {
   };
 
   onPlayCard = async (id) => {
-    console.log(id);
     let card = await API.getCardData(id);
     if (card.type_code === TYPES.Character) {
       this.setState(
@@ -294,17 +293,38 @@ class Board extends React.Component {
     }
   };
 
+  returnToPlots = (id) => {
+    this.setState(state => {
+      let newPlotsHand = state.plotsHand.concat(id);
+      let indexOfReturned = state.pastPlots.indexOf(id);
+      let newList = [...state.pastPlots];
+      newList.splice(indexOfReturned, 1)
+      return { pastPlots: newList, plotsHand: newPlotsHand }
+    })
+  }
+
+  shuffleHand = () => {
+    this.setState({ hand: shuffle(this.state.hand) }/* , () => localStorage.setItem('hand', this.state.hand) */)
+  }
+
   render() {
     if (!this.state.faction) {
-      console.log('No faction selected')
       if (!this.props.owner) {
         return <p>Waiting for opponent...</p>;
       } else {
         return <SelectFaction onSelectFaction={this.selectFaction} />;
       }
     } else {
+      const value = {
+        hand: this.state.hand,
+        returnToHand: this.returnToHand,
+        playPlot: this.onPlayCard,
+        addAttachment: this.handleAttachmentDialog,
+        returnToPlots: this.returnToPlots
+  
+      }
       return (
-        <>
+        <HandContext.Provider value={value}>
           <Row>
             <Col sm={8}>
               <Row>
@@ -407,6 +427,7 @@ class Board extends React.Component {
                       onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
                       onPlayCard={() => this.onPlayCard(c)}
                       onReturnToDeck={() => this.returnToDeck(c)}
+                      onShowInfo={()=>this.showCardInfo(c)}
                     ></HandCard>
                   </Col>
                 ))}
@@ -435,7 +456,7 @@ class Board extends React.Component {
               this.handleAttachmentDialog(null);
             }}
           />
-        </>
+        </HandContext.Provider>
       );
     }
   }
