@@ -7,7 +7,7 @@ import PlayedCard from './PlayedCard';
 import AddCardForm from './AddCardForm';
 import Pile from './Pile';
 import GoldPow from './GoldPow';
-import {FROMARRAY,AttachmentAction, TYPES, shuffle} from '../common/constants';
+import {FROMARRAY,AttachmentAction, TYPES, shuffle} from '../common/Utility/constants';
 import CardInfoDialog from './CardInfoDialog';
 import AttachmentDialog from './AttachmentDialog'
 import API from '../api'

@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import { withRouter } from "react-router-dom";
-import { DEBUG, debugState} from "./common/constants";
+import { DEBUG, debugState} from "./common/Utility/constants";
 import Board from "./components/Board";
 import State from "./common/State";
 

@@ -2,7 +2,6 @@ import React from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import HandCard from "./HandCard";
 import FactionCard from "./FactionCard";
-import Deck from "./Deck";
 import PlayedCard from "./PlayedCard";
 import AddCardForm from "./AddCardForm";
 import Pile from "./Pile";
@@ -12,29 +11,37 @@ import {
   TYPES,
   shuffle,
   Decks,
-} from "../common/constants";
+} from "../common/Utility/constants";
 import CardInfoDialog from "./CardInfoDialog";
 import AttachmentDialog from "./AttachmentDialog";
 import API from "../api";
-import { socket } from "../common/socket";
+import { socket } from "../common/Utility/socket";
 import SelectFaction from "./SelectFaction";
 import {HandContext} from '../provider/HandContext';
+import Deck from '../common/Deck';
+import State from "../common/State";
+import Card from "../common/Card/Card"
+import PlaceCard from "../common/Card/PlaceCard";
+import PlotCard from "../common/Card/PlotCard";
+import EventCard from "../common/Card/EventCard";
+import AttachmentCard from "../common/Card/AttachmentCard";
+import CharacterCard from "../common/Card/CharacterCard";
+interface IProps {
+  boardState:State;
+  owner:boolean;
+}
 
-class Board extends React.Component {
-  constructor(props) {
+
+class Board extends React.Component<IProps, State>  {
+  constructor(props:IProps) {
     super(props);
     this.state = props.boardState;
   }
 
-  selectFaction = (faction) => {
-    const deck = shuffle(Decks[faction].cards);
-    const plotsHand = Decks[faction].plots;
-
+  selectFaction = (deck:Deck ) => {
     this.setState(
       {
-        faction: faction,
-        deck: deck,
-        plotsHand: plotsHand,
+        deck:deck
       },
       () => socket.emit("game", this.state)
     );
@@ -50,15 +57,16 @@ class Board extends React.Component {
     }
   }
 
-  discardCard = (id, from) => {
+  discardCard = (id:number, from:string) => {
     if (from !== FROMARRAY.Chars) {
       this.setState(
         (state) => {
-          let discarded = state.discardedList.concat(id);
-          let indexOfDiscarded = state[from].indexOf(id);
-          let newList = [...state[from]];
+          var newCard:Card=new Card(id);
+          let discarded = state.discardedCards.concat(newCard);
+          let indexOfDiscarded = state.playedCharacterCards.indexOf(newCard);
+          let newList = [...state.playedCharacterCards];
           newList.splice(indexOfDiscarded, 1);
-          return { [from]: newList, discardedList: discarded };
+          return { [from]: newList, discardedCards: discarded };
         },
         () => socket.emit("game", this.state)
       );
@@ -67,11 +75,12 @@ class Board extends React.Component {
       this.setState(
         (state) => {
           console.log(id);
-          let discarded = state.discardedList.concat(id);
-          let indexOfDiscarded = state.chars.map((c) => c.charId).indexOf(id);
-          let newList = [...state.chars];
+          var newCard=new Card(id);
+          let discarded = state.discardedCards.concat(newCard);
+          let indexOfDiscarded = state.playedCharacterCards.map((c) => c.id).indexOf(newCard.id);
+          let newList = [...state.playedCharacterCards];
           newList.splice(indexOfDiscarded, 1);
-          return { chars: newList, discardedList: discarded };
+          return { playedCharacterCards: newList, discardedCards: discarded };
         },
         () => socket.emit("game", this.state)
       );
@@ -79,19 +88,17 @@ class Board extends React.Component {
     }
   };
 
-  onPlayCard = async (id) => {
+  onPlayCard = async (id:number) => {
     let card = await API.getCardData(id);
     if (card.type_code === TYPES.Character) {
       this.setState(
         (state) => {
-          let newCharsList = state.chars.concat({
-            charId: id,
-            attachments: [],
-          });
-          let indexOfDiscarded = state.hand.indexOf(id);
+          var newCard=new Card(id);
+          let newCharsList = state.playedCharacterCards.concat(newCard);
+          let indexOfDiscarded = state.hand.indexOf(newCard);
           let newHand = [...state.hand];
           newHand.splice(indexOfDiscarded, 1);
-          return { hand: newHand, chars: newCharsList };
+          return { hand: newHand, playedCharacterCards: newCharsList };
         },
         () => socket.emit("game", this.state)
       );
@@ -100,11 +107,12 @@ class Board extends React.Component {
     if (card.type_code === TYPES.Location) {
       this.setState(
         (state) => {
-          let newPlacesList = state.places.concat(id);
-          let indexOfDiscarded = state.hand.indexOf(id);
+          var newCard=new PlaceCard(id);
+          let newPlacesList = state.playedPlaces.concat(newCard);
+          let indexOfDiscarded = state.hand.indexOf(newCard);
           let newHand = [...state.hand];
           newHand.splice(indexOfDiscarded, 1);
-          return { hand: newHand, places: newPlacesList };
+          return { hand: newHand, playedPlaces: newPlacesList };
         },
         () => socket.emit("game", this.state)
       );
@@ -113,11 +121,12 @@ class Board extends React.Component {
     if (card.type_code === TYPES.Plot) {
       this.setState(
         (state) => {
-          let newPastPlotsList = state.pastPlots.concat(id);
-          let indexOfDiscarded = state.plotsHand.indexOf(id);
-          let newPlotsHand = [...state.plotsHand];
+          var newCard=new PlotCard(id);
+          let newPastPlotsList = state.pastPlots.concat(newCard);
+          let indexOfDiscarded = state.handCards.indexOf(newCard);
+          let newPlotsHand = [...state.handCards];
           newPlotsHand.splice(indexOfDiscarded, 1);
-          return { plotsHand: newPlotsHand, pastPlots: newPastPlotsList };
+          return { handCards: newPlotsHand, pastPlots: newPastPlotsList };
         },
         () => socket.emit("game", this.state)
       );
@@ -126,7 +135,7 @@ class Board extends React.Component {
     if (card.type_code === TYPES.Event) {
       this.setState(
         {
-          eventDialogCard: id,
+          eventDialogCard: new EventCard(id),
         },
         () => socket.emit("game", this.state)
       );
@@ -135,7 +144,7 @@ class Board extends React.Component {
     if (card.type_code === TYPES.Attachment) {
       this.setState(
         {
-          attachmentCard: id,
+          attachmentCard: new AttachmentCard(id),
         },
         () => socket.emit("game", this.state)
       );
@@ -143,44 +152,45 @@ class Board extends React.Component {
     }
   };
 
-  killChar = (id) => {
+  killChar = (id:number) => {
     this.setState(
       (state) => {
-        let deads = state.deadList.concat(id);
-        let indexOfKilled = state.chars.map((c) => c.charId).indexOf(id);
-        let newChars = [...state.chars];
+        let deads = state.deadCards.concat(new Card(id));
+        let indexOfKilled = state.playedCharacterCards.map((c) => c.id).indexOf(id);
+        let newChars = [...state.playedCharacterCards];
         newChars.splice(indexOfKilled, 1);
-        return { chars: newChars, deadList: deads };
+        return { playedCharacterCards: newChars, deadCards: deads };
       },
       () => socket.emit("game", this.state)
     );
     //})
   };
-  returnToHand = (id, from) => {
+  returnToHand = (id:number, from:string) => {
     this.setState(
       (state) => {
-        let newHand = state.hand.concat(id);
+        let newHand = state.hand.concat(new Card(id));
         let indexOfReturned =
           from === FROMARRAY.Chars
-            ? state.chars.map((c) => c.charId).indexOf(id)
+            ? state.playedCharacterCards.map((c) => c.id).indexOf(id)
             : state[from].indexOf(id);
         let newList = [...state[from]];
         newList.splice(indexOfReturned, 1);
-        return { [from]: newList, hand: newHand };
+        return { [from]: newList, handCards: newHand };
       },
       () => socket.emit("game", this.state)
     );
     //}, () => localStorage.setItem('hand', this.state.hand))
   };
 
-  returnToDeck = (id) => {
+  returnToDeck = (id:number) => {
     this.setState(
       (state) => {
-        let newDeck = state.deck.concat(id);
-        let indexOfDiscarded = state.hand.indexOf(id);
+        var newCard=new Card(id);
+        let newDeck = state.coverDeck.concat(newCard);
+        let indexOfDiscarded = state.hand.indexOf(newCard);
         let newHand = [...state.hand];
         newHand.splice(indexOfDiscarded, 1);
-        return { hand: newHand, deck: newDeck };
+        return { handCards: newHand, deck: newDeck };
       },
       () => socket.emit("game", this.state)
     );
@@ -190,9 +200,9 @@ class Board extends React.Component {
   addCard = () => {
     this.setState(
       (state) => {
-        let id = state.cards.length + 1;
-        const cardsList = state.cards.concat(id);
-        return { cards: cardsList };
+        let id = state.handCards.length + 1;
+        const cardsList = state.handCards.concat(new Card(id));
+        return { handCards: cardsList };
       },
       () => socket.emit("game", this.state)
     );
@@ -213,38 +223,38 @@ class Board extends React.Component {
     //}, () => localStorage.setItem('hand', this.state.hand))
   };
 
-  handleEventCard = (id) => {
+  handleEventCard = (id:number) => {
     this.discardCard(id, FROMARRAY.Hand);
     this.setState({ eventDialogCard: null });
   };
 
-  setGoldPow = (gold, pow) => {
+  setGoldPow = (gold:number, pow:number) => {
     console.log(gold, pow);
     this.setState({ gold: gold, power: pow }, () =>
       socket.emit("game", this.state)
     );
   };
 
-  attachmentAction = (attachmentId, charId, action) => {
+  attachmentAction = (attachmentId:number, charId:number, action) => {
     this.setState(
       (state) => {
         // update status of characters
-        let indexOfChar = state.chars.map((c) => c.charId).indexOf(charId);
-        let char = state.chars.find((c) => c.charId === charId);
-        let newAttachmentsList = [...char.attachments].filter(
+        let indexOfChar = state.playedCharacterCards.map((c) => c.id).indexOf(charId);
+        let characters:CharacterCard = state.playedCharacterCards.find((c) => c.id === charId);
+        let newAttachmentsList = [...characters.attachments].filter(
           (a) => a !== attachmentId
         );
-        let newChars = [...state.chars];
+        let newChars:Array<CharacterCard> = [...state.playedCharacterCards];
         newChars[indexOfChar].attachments = newAttachmentsList;
 
         // update hand/discarded
         let newList;
         if (action === AttachmentAction.Discard) {
-          newList = state.discardedList.concat(attachmentId);
-          return { chars: newChars, discardedList: newList };
+          newList = state.discardedCards.concat(attachmentId);
+          return { playedCharacterCards: newChars, discardedCards: newList };
         } else {
           newList = state.hand.concat(attachmentId);
-          return { chars: newChars, hand: newList };
+          return { playedCharacterCards: newChars, handCards: newList };
         }
       },
       () => socket.emit("game", this.state)
@@ -252,7 +262,7 @@ class Board extends React.Component {
     //})
   };
 
-  addCardToHand = (id) => {
+  addCardToHand = (id:Card) => {
     this.setState(
       (state) => {
         let newHand = state.hand.concat(id);
@@ -263,17 +273,17 @@ class Board extends React.Component {
     //}, () => localStorage.setItem('hand', this.state.hand))
   };
 
-  showCardInfo = (id) => {
+  showCardInfo = (id:Card) => {
     this.setState({ infoCard: id });
   };
 
-  handleAttachmentDialog = (attachmentId, targetId) => {
+  handleAttachmentDialog = (attachmentId:AttachmentCard, targetId:Card) => {
     const attachmentCard = this.state.attachmentCard;
     if (!targetId) {
       this.setState({ attachmentCard: null });
     } else {
-      let chars = [...this.state.chars];
-      let targetIndex = chars.map((c) => c.charId).indexOf(targetId);
+      let chars = [...this.state.playedCharacterCards];
+      let targetIndex = chars.map((c) => c.id).indexOf(targetId);
       // console.log(targetIndex)
       if (!chars[targetIndex].attachments) {
         chars[targetIndex].attachments = [attachmentCard];
@@ -286,7 +296,7 @@ class Board extends React.Component {
       let newHand = [...this.state.hand];
       let indexOfPlayed = this.state.hand.indexOf(attachmentId);
       newHand.splice(indexOfPlayed, 1);
-      this.setState({ attachmentCard: null, chars: chars, hand: newHand }, () =>
+      this.setState({ attachmentCard: null, playedCharacterCards: chars, hand: newHand }, () =>
         socket.emit("game", this.state)
       );
       //}, () => localStorage.setItem('hand', this.state.hand))
@@ -295,11 +305,11 @@ class Board extends React.Component {
 
   returnToPlots = (id) => {
     this.setState(state => {
-      let newPlotsHand = state.plotsHand.concat(id);
+      let newPlotsHand = state.handCards.concat(id);
       let indexOfReturned = state.pastPlots.indexOf(id);
       let newList = [...state.pastPlots];
       newList.splice(indexOfReturned, 1)
-      return { pastPlots: newList, plotsHand: newPlotsHand }
+      return { pastPlots: newList, handCards: newPlotsHand }
     })
   }
 
