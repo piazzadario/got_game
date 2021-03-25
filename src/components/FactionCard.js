@@ -21,7 +21,7 @@ const FactionCard = (props) => {
 
     return (
         <Col sm={4} >
-            <div className='m-1' onClick={() => setKneed(!isKneed)} style={{position:'relative'}}>
+            <div className='m-1' onClick={() => {if(props.owner) setKneed(!isKneed)}} style={{position:'relative'}}>
                 <img style={{ maxWidth: '100%', maxHeight: '100%' }} className={isKneed ? 'kneed' : ''} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${code}A.jpg`} alt='teste'></img>
             </div>
                 <GoldPow owner={props.owner}
