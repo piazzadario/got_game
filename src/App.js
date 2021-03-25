@@ -8,6 +8,7 @@ import SelectFaction from './components/SelectFaction';
 import { DEBUG, debugState, Decks, shuffle } from './common/constants';
 import Board from './components/Board';
 import State from './common/State';
+import { socket } from "./common/socket";
 
 class App extends React.Component {
 
@@ -17,10 +18,7 @@ class App extends React.Component {
   }
 
 
-  selectFaction = (faction) => {
-    this.setState({ faction: faction, deck: shuffle(Decks[faction].cards), plotsHand: Decks[faction].plots })
-
-  }
+  
 
 
   returnToPlots = (id) => {
@@ -51,13 +49,10 @@ class App extends React.Component {
       <HandContext.Provider value={value}>
         <Switch>
           <Route exact path='/'>
-            {this.state.faction ? <div className='mx-3 my-1'>
               <Board boardState={this.state.opponent} owner={false} />
               <hr style={{borderTop: '3px solid black'}}></hr>
               <Board boardState={this.state.me} owner={true} />
-            </div> :
-              <SelectFaction onSelectFaction={this.selectFaction} />
-            }
+            
           </Route>
           <Route exact path='/hand'>
             <Hand></Hand>
