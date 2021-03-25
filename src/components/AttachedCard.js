@@ -11,7 +11,7 @@ const AttachedCard = (props) => {
     const [attachmentVisible, setAttachmentVisible] = useState(false)
 
     return (
-        <div onMouseOver={() => { setAttachmentVisible(true) }} onMouseLeave={() => setAttachmentVisible(false)} onClick={() => setKneed(!isKneed)}
+        <div onMouseOver={() => { setAttachmentVisible(true) }} onMouseLeave={() => setAttachmentVisible(false)} onClick={() => props.onKnee}
             style={{ position: 'relative', marginTop: `${-110 + (idx * -1 - 1)}%`, zIndex: `${attachmentVisible ? '999' : (20 - idx - 1)}` }} >
             <img key={idx} style={{ height: '100%', width: '100%' }}
                 className={isKneed ? 'kneed' : ''}

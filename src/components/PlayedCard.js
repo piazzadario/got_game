@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Col, Button, Row } from 'react-bootstrap';
+import { FROMARRAY } from '../common/constants';
 import '../custom.css';
+import { HandContext } from '../provider/HandContext';
 import AttachedCard from './AttachedCard';
 
 const AttachmentAction = {
@@ -12,17 +14,18 @@ const PlayedCard = (props) => {
 
     const card = props.card;
     const isChar = props.isChar;
-    const id = isChar? card.charId : card;
+    const from = isChar? FROMARRAY.Chars : FROMARRAY.Places;
+    const id =  card.id;
     const attachmentList = isChar? card.attachments : [];
-    const [isKneed, setKneed] = useState(false);
+    // const [isKneed, setKneed] = useState(false);
     const [isMenuVisible, setVisible] = useState(false);
     const [powerPoints, setPower] = useState(0);
 
 
     return (
         <Col sm={2} style={{ position: 'relative', display: 'table', width:'12.5%', maxWidth:'12.5%' }} className='mb-1 mx-2 px-0'>
-            <div onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onClick={() => setKneed(!isKneed)} style={{ position: 'relative', zIndex: '20', width:'100%'}}>
-                <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} className={isKneed ? 'kneed' : ''} style={{ maxWidth: '100%', maxHeight: '100%' }} alt='teste'></img>
+            <div onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onClick={() => props.onKnee(card.id,from)} style={{ position: 'relative', zIndex: '20', width:'100%'}}>
+                <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} className={card.isKneed ? 'kneed' : ''} style={{ maxWidth: '100%', maxHeight: '100%' }} alt='teste'></img>
                 <Row className=' justify-content-center ml-0' style={{ height: '35px', width: '100%', position: 'absolute', top: '0%', zIndex: '999' }} >
                     <Button variant='secondary mr-1' onClick={(ev) => { if (powerPoints) setPower(powerPoints - 1); ev.stopPropagation() }} hidden={!isMenuVisible || !props.owner}>-</Button>
                     <p className="w3-badge w3-large w3-blue" >{powerPoints}</p>
@@ -38,8 +41,9 @@ const PlayedCard = (props) => {
                 }
             </div>
 
-            {isChar && attachmentList.map((a, idx) =>
+            {attachmentList.map((a, idx) =>
                 <AttachedCard attachmentId={a} key={a} idx={idx}
+                    onKnee = {()=>props.onKnee(a,from,id)}
                     owner={props.owner}
                     onShowCardInfo={props.onShowCardInfo}
                     onDiscard={() => props.handleAttachment(a, id, AttachmentAction.Discard)}

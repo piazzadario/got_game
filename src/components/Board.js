@@ -23,7 +23,7 @@ import {HandContext} from '../provider/HandContext';
 class Board extends React.Component {
   constructor(props) {
     super(props);
-    this.state = props.boardState;
+    this.state = {...props.boardState};
   }
 
   selectFaction = (faction) => {
@@ -68,7 +68,7 @@ class Board extends React.Component {
         (state) => {
           console.log(id);
           let discarded = state.discardedList.concat(id);
-          let indexOfDiscarded = state.chars.map((c) => c.charId).indexOf(id);
+          let indexOfDiscarded = state.chars.map((c) => c.id).indexOf(id);
           let newList = [...state.chars];
           newList.splice(indexOfDiscarded, 1);
           return { chars: newList, discardedList: discarded };
@@ -85,8 +85,9 @@ class Board extends React.Component {
       this.setState(
         (state) => {
           let newCharsList = state.chars.concat({
-            charId: id,
+            id: id,
             attachments: [],
+            isKneed: false
           });
           let indexOfDiscarded = state.hand.indexOf(id);
           let newHand = [...state.hand];
@@ -100,7 +101,10 @@ class Board extends React.Component {
     if (card.type_code === TYPES.Location) {
       this.setState(
         (state) => {
-          let newPlacesList = state.places.concat(id);
+          let newPlacesList = state.places.concat({
+            id: id,
+            isKneed: false
+          });
           let indexOfDiscarded = state.hand.indexOf(id);
           let newHand = [...state.hand];
           newHand.splice(indexOfDiscarded, 1);
@@ -147,7 +151,7 @@ class Board extends React.Component {
     this.setState(
       (state) => {
         let deads = state.deadList.concat(id);
-        let indexOfKilled = state.chars.map((c) => c.charId).indexOf(id);
+        let indexOfKilled = state.chars.map((c) => c.id).indexOf(id);
         let newChars = [...state.chars];
         newChars.splice(indexOfKilled, 1);
         return { chars: newChars, deadList: deads };
@@ -160,10 +164,17 @@ class Board extends React.Component {
     this.setState(
       (state) => {
         let newHand = state.hand.concat(id);
-        let indexOfReturned =
-          from === FROMARRAY.Chars
-            ? state.chars.map((c) => c.charId).indexOf(id)
-            : state[from].indexOf(id);
+        let indexOfReturned;
+        if(from === FROMARRAY.Chars) {
+          indexOfReturned = state.chars.map((c) => c.id).indexOf(id);
+        }else if(from === FROMARRAY.Places){
+          indexOfReturned = state.places.map((p) => p.id).indexOf(id)
+        }else {
+          indexOfReturned = state[from].indexOf(id);
+        }
+        /*   from === FROMARRAY.Chars
+            ? state.chars.map((c) => c.id).indexOf(id)
+            : state[from].indexOf(id); */
         let newList = [...state[from]];
         newList.splice(indexOfReturned, 1);
         return { [from]: newList, hand: newHand };
@@ -187,7 +198,7 @@ class Board extends React.Component {
     //}, () => localStorage.setItem('hand', this.state.hand))
   };
 
-  addCard = () => {
+  /* addCard = () => {
     this.setState(
       (state) => {
         let id = state.cards.length + 1;
@@ -197,7 +208,7 @@ class Board extends React.Component {
       () => socket.emit("game", this.state)
     );
     //}, () => localStorage.setItem('hand', this.state.hand));
-  };
+  }; */
 
   drawCard = () => {
     this.setState(
@@ -229,8 +240,8 @@ class Board extends React.Component {
     this.setState(
       (state) => {
         // update status of characters
-        let indexOfChar = state.chars.map((c) => c.charId).indexOf(charId);
-        let char = state.chars.find((c) => c.charId === charId);
+        let indexOfChar = state.chars.map((c) => c.id).indexOf(charId);
+        let char = state.chars.find((c) => c.id === charId);
         let newAttachmentsList = [...char.attachments].filter(
           (a) => a !== attachmentId
         );
@@ -273,7 +284,7 @@ class Board extends React.Component {
       this.setState({ attachmentCard: null });
     } else {
       let chars = [...this.state.chars];
-      let targetIndex = chars.map((c) => c.charId).indexOf(targetId);
+      let targetIndex = chars.map((c) => c.id).indexOf(targetId);
       // console.log(targetIndex)
       if (!chars[targetIndex].attachments) {
         chars[targetIndex].attachments = [attachmentCard];
@@ -303,6 +314,38 @@ class Board extends React.Component {
     })
   }
 
+  kneeCard = (id,from, attachedTo=null) => {
+    // if is not an attachment, it's a place or a character
+    if(!attachedTo){
+      this.setState(state =>{
+        console.log(state[from])
+        let indexOftarget = state[from].map(card => card.id).indexOf(id);
+        let newArray = [...state[from]];
+        let newState = !(state[from][indexOftarget].isKneed);
+        let updatedCard  = {...newArray[indexOftarget]};
+        updatedCard.isKneed = newState;
+        newArray[indexOftarget] = updatedCard;
+        console.log(newArray)
+        console.log('NewState: ',newState)
+        // console.log(newArray)
+        return {[from]: newArray}
+      },() => socket.emit("game", this.state))
+    }else{
+      this.setState(state =>{
+        let indexOftarget = state[from].map(card => card.id).indexOf(attachedTo);
+        let newArray = [...state[from]];
+        let newState = !(state[from][indexOftarget].isKneed);
+        let updatedCard  = {...newArray[indexOftarget]};
+        updatedCard.isKneed = newState;
+        newArray[indexOftarget] = updatedCard;
+        console.log(newArray)
+        console.log('NewState: ',newState)
+        // console.log(newArray)
+        return {[from]: newArray}
+      },() => socket.emit("game", this.state))
+    }
+  }
+
   shuffleHand = () => {
     this.setState({ hand: shuffle(this.state.hand) }/* , () => localStorage.setItem('hand', this.state.hand) */)
   }
@@ -320,7 +363,8 @@ class Board extends React.Component {
         returnToHand: this.returnToHand,
         playPlot: this.onPlayCard,
         addAttachment: this.handleAttachmentDialog,
-        returnToPlots: this.returnToPlots
+        returnToPlots: this.returnToPlots,
+        // kneeCard: this.kneeCard
   
       }
       return (
@@ -330,17 +374,18 @@ class Board extends React.Component {
               <Row>
                 {this.state.chars.map((c) => (
                   <PlayedCard
+                    onKnee = {this.kneeCard}
                     card={c}
-                    key={c.charId}
+                    key={c.id}
                     owner={this.props.owner}
                     onDiscard={() =>
-                      this.discardCard(c.charId, FROMARRAY.Chars)
+                      this.discardCard(c.id, FROMARRAY.Chars)
                     }
-                    onKill={() => this.killChar(c.charId)}
+                    onKill={() => this.killChar(c.id)}
                     onShowCardInfo={this.showCardInfo}
                     isChar={true}
                     onReturnToHand={() =>
-                      this.returnToHand(c.charId, FROMARRAY.Chars)
+                      this.returnToHand(c.id, FROMARRAY.Chars)
                     }
                     handleAttachment={this.attachmentAction}
                   ></PlayedCard>
@@ -349,6 +394,7 @@ class Board extends React.Component {
               <Row>
                 {this.state.places.map((c) => (
                   <PlayedCard
+                    onKnee = {this.kneeCard}
                     card={c}
                     key={c}
                     isChar={false}
