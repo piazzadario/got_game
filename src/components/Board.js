@@ -481,10 +481,10 @@ class Board extends React.Component {
           </Row>
 
           <Row hidden={!this.props.owner}>
-            <Col sm={7}>
+            <Col sm={10}>
               <Row className="px-3">
                 {this.state.hand.map((c, idx) => (
-                  <Col className="handCard p-0" sm={2} key={c}>
+                  <Col className="handCard p-0" style={{position: 'relative', display: 'table', width:'12.5%', maxWidth:'12.5%'}} key={c}>
                     <HandCard
                       id={c}
                       idx={idx + 1}
