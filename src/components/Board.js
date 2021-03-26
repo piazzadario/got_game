@@ -87,7 +87,8 @@ class Board extends React.Component {
           let newCharsList = state.chars.concat({
             id: id,
             attachments: [],
-            isKneed: false
+            isKneed: false,
+            powerPoints: 0
           });
           let indexOfDiscarded = state.hand.indexOf(id);
           let newHand = [...state.hand];
@@ -103,7 +104,8 @@ class Board extends React.Component {
         (state) => {
           let newPlacesList = state.places.concat({
             id: id,
-            isKneed: false
+            isKneed: false,
+            powerPoints:0
           });
           let indexOfDiscarded = state.hand.indexOf(id);
           let newHand = [...state.hand];
@@ -346,6 +348,20 @@ class Board extends React.Component {
     }
   }
 
+  handlePower = (id, newPower,from)=>{
+    this.setState(state =>{
+      let indexOftarget = state[from].map(card => card.id).indexOf(id);
+      let newArray = [...state[from]];
+      let updatedCard  = {...newArray[indexOftarget]};
+      updatedCard.powerPoints = newPower;
+      newArray[indexOftarget] = updatedCard;
+      console.log(newArray)
+      console.log('NewState: ',newPower)
+      // console.log(newArray)
+      return {[from]: newArray}
+    },() => socket.emit("game", this.state))
+  }
+
   shuffleHand = () => {
     this.setState({ hand: shuffle(this.state.hand) }/* , () => localStorage.setItem('hand', this.state.hand) */)
   }
@@ -388,6 +404,7 @@ class Board extends React.Component {
                       this.returnToHand(c.id, FROMARRAY.Chars)
                     }
                     handleAttachment={this.attachmentAction}
+                    handlePower = {this.handlePower}
                   ></PlayedCard>
                 ))}
               </Row>
@@ -395,14 +412,16 @@ class Board extends React.Component {
                 {this.state.places.map((c) => (
                   <PlayedCard
                     onKnee = {this.kneeCard}
+                    owner={this.props.owner}
                     card={c}
                     key={c}
                     isChar={false}
-                    onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
+                    onDiscard={() => this.discardCard(c.id, FROMARRAY.Places)}
                     onShowCardInfo={this.showCardInfo}
                     onReturnToHand={() =>
-                      this.returnToHand(c, FROMARRAY.Places)
+                      this.returnToHand(c.id, FROMARRAY.Places)
                     }
+                    handlePower = {this.handlePower}
                   ></PlayedCard>
                 ))}
               </Row>
