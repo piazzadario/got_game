@@ -1,10 +1,10 @@
+const PORT = process.env.PORT || 3001;
 const express = require('express');
-const path = require('path');
 const socket = require('socket.io');
 
 const app = express();
 app.use(express.static('../build'))
-const server = app.listen(3001,()=> console.log('Server listening on port 3001'));
+const server = app.listen(PORT,()=> console.log('Server listening on port 3001'));
 
 
 // socket configuration
@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
     console.log('a user connected: ID = ',socket.id);
 
     socket.on('message', (message) =>     {
-        console.log(message);
+        // console.log(message);
         io.emit('message', `${socket.id.substr(0,2)} said ${message}` );   
     });
 
@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('game', (gameState) =>     {
-        console.log(gameState);
+        // console.log(gameState);
         socket.broadcast.emit('game', gameState );   
     });
 });
