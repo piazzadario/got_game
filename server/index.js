@@ -3,7 +3,7 @@ const path = require('path');
 const socket = require('socket.io');
 
 const app = express();
-// app.use(express.static('../client/build'))
+app.use(express.static('../build'))
 const server = app.listen(3001,()=> console.log('Server listening on port 3001'));
 
 
