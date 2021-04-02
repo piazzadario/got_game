@@ -21,10 +21,11 @@ const PlayedCard = (props) => {
     // const [isKneed, setKneed] = useState(false);
     const [isMenuVisible, setVisible] = useState(false);
     // const [powerPoints, setPower] = useState(0);
-
+    console.log(id);
     
 
     return (
+        
         <Col sm={2} style={{ position: 'relative', display: 'table', width:'12.5%', maxWidth:'12.5%' }} className='mb-1 mx-2 px-0'>
             <div onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onClick={() => props.onKnee(card.id,from)} style={{ position: 'relative', zIndex: '20', width:'100%'}}>
                 <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT${id}.jpg`} className={card.isKneed ? 'kneed' : ''} style={{ maxWidth: '100%', maxHeight: '100%' }} alt='teste'></img>
