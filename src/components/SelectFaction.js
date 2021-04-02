@@ -5,7 +5,7 @@ const SelectFaction = (props) => {
 
     
     return (
-        <Row className='align-items-center justify-content-around' style={{ width: '100vw', height: '100vh' }}>
+        <Row className='align-items-center justify-content-around' style={{ width: '100vw', height: '50vh' }}>
             <Button onClick={() => props.onSelectFaction('BarNig')}>Baratheon/Guardiani</Button>
             <Button onClick={() => props.onSelectFaction('StaGre')}>Stark/Greyjoy</Button>
             <Button onClick={() => props.onSelectFaction('LanTyr')}>Lannister/Tyrell</Button>

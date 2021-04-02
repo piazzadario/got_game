@@ -30,8 +30,7 @@ export const Decks = {
     //Stark/Greyjoy
     StaGre: {
         cards: [
-            // "01_141",
-            "aklkdklss",
+            "01_141",
             "01_142",
             "01_143",
             "01_144",
