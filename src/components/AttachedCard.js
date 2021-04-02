@@ -15,7 +15,7 @@ const AttachedCard = (props) => {
             style={{ position: 'relative', marginTop: `${-110 + (idx * -1 - 1)}%`, zIndex: `${attachmentVisible ? '999' : (20 - idx - 1)}` }} >
             <img key={idx} style={{ height: '100%', width: '100%' }}
                 className={isKneed ? 'kneed' : ''}
-                src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${attachmentId}.jpg`}
+                src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT${attachmentId}.jpg`}
                 alt='teste'></img>
             {attachmentVisible  && <div className='card-options'>
                 <Button className='mb-1 px-2 py-0' variant='secondary' onClick={() => props.onDiscard()} hidden={!props.owner}>DISCARD</Button>

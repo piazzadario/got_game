@@ -12,7 +12,7 @@ const CardInfoDialog = (props) => {
                 <Modal.Title>{type + ' info'}</Modal.Title>
             </Modal.Header>
             <Modal.Body >
-                <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} alt='teste'></img>
+                <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT${id}.jpg`} alt='teste'></img>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={props.onHide}>

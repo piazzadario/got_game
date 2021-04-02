@@ -16,7 +16,7 @@ const AttachmentChar = (props) => {
             {(context) =>
                 <Row onMouseOver={() => setVisible(true)} onMouseLeave={() => setVisible(false)} className='align-items-center'>
 
-                    <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} style={{ zIndex: '2' }} alt='teste'></img>
+                    <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT${id}.jpg`} style={{ zIndex: '2' }} alt='teste'></img>
                     {isMenuVisible &&
                         <Button className='ml-1' variant='warning' style={{ maxHeight: '100px' }} 
                         onClick={()=>props.onAttach()}>ATTACH</Button>

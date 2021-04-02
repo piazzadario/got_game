@@ -217,6 +217,7 @@ class Board extends React.Component {
       (state) => {
         let tmpDeck = [...state.deck];
         let drawnCard = tmpDeck.pop();
+        console.log(drawnCard);
         let newHand = state.hand.concat(drawnCard);
         console.log(state.deck.length, tmpDeck.length);
         return { hand: newHand, deck: tmpDeck };

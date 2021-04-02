@@ -16,7 +16,7 @@ const HandCard = (props) => {
         src={
           isHidden
             ? "https://www.picclickimg.com/d/l400/pict/383447897333_/A-Game-Of-Thrones-LCG-2nd-Edition.jpg"
-            : `https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`
+            : `https://lcg-cdn.fantasyflightgames.com/got2nd/GT${id}.jpg`
         }
         className={isHidden ? "card-img" : ""}
         style={{ zIndex: "2", maxWidth: "100%", maxHeight: "100%" }}
