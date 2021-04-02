@@ -1,0 +1,36 @@
+// https://www.picclickimg.com/d/l400/pict/383447897333_/A-Game-Of-Thrones-LCG-2nd-Edition.jpg
+
+import React, { useState } from 'react';
+import { Button, Col } from 'react-bootstrap';
+import Card from '../common/Card/Card';
+import '../custom.css'
+
+interface DeckComponentProps {
+    owner: boolean,
+    cards: Card[],
+    drawCard: Function,
+    shuffle: Function
+}
+const DeckComponent: React.FC<DeckComponentProps> = (props) => {
+
+    const cards = props.cards;
+    const length = cards.length;
+
+    const [isMenuVisible, setMenuVisible] = useState(false);
+
+
+    return (
+        <Col sm={4} >
+            <div className='m-1' style={{ position: 'relative', maxWidth: '100%' }} onMouseOver={() => setMenuVisible(true)} onMouseLeave={() => setMenuVisible(false)} >
+                <img style={{ maxWidth: '100%', maxHeight: '100%' }} onClick={() => { if (props.owner) props.drawCard() }} src={`https://www.picclickimg.com/d/l400/pict/383447897333_/A-Game-Of-Thrones-LCG-2nd-Edition.jpg`} alt='teste'>
+                </img>
+                <p className="w3-badge w3-xlarge w3-padding w3-green deck-badge" >{length}</p>
+
+                {isMenuVisible && <Button variant='secondary' className='deck-action' onClick={() => props.shuffle()} hidden={!props.owner}>SHUFFLE</Button>
+                }
+            </div>
+        </Col>
+    );
+}
+
+export default DeckComponent;

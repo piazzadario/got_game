@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import HandCard from './HandCard';
 import FactionCard from './FactionCard';
-import Deck from './Deck';
+import Deck from './DeckComponent';
 import PlayedCard from './PlayedCard';
 import AddCardForm from './AddCardForm';
 import Pile from './Pile';

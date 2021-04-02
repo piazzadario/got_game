@@ -1,9 +1,12 @@
 import React from 'react';
 import { Row, Button } from 'react-bootstrap';
 
-const SelectFaction = (props) => {
+interface WelcomeProps {
+    onSelectFaction:Function
+   }
 
-    
+   
+const SelectFaction: React.FC<WelcomeProps>  = (props) => {
     return (
         <Row className='align-items-center justify-content-around' style={{ width: '100vw', height: '100vh' }}>
             <Button onClick={() => props.onSelectFaction('BarNig')}>Baratheon/Guardiani</Button>

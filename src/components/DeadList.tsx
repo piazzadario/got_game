@@ -1,8 +1,14 @@
-import React, {useState} from 'react';
-import { Badge,Col,Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Badge, Col, Button } from 'react-bootstrap';
+import Card from '../common/Card/Card';
 import ModalList from './ModalList';
 
-const DeadList = (props) => {
+interface DeadListgProps {
+    items: Card[],
+
+}
+
+const DeadList: React.FC<DeadListgProps> = (props) => {
 
     const items = props.items;
     const length = items.length;
@@ -22,7 +28,7 @@ const DeadList = (props) => {
 
                     </img>
                     <Badge style={{ position: 'absolute', top: '0', right: '0' }} variant='secondary' >{length}</Badge>
-                    {items.length>0 && <Col style={{ position: 'absolute', top: '10%', left:'10%', zIndex: '3', width: '100%' }}>
+                    {items.length > 0 && <Col style={{ position: 'absolute', top: '10%', left: '10%', width: '100%' }}>
                         <Col >
                             <Button variant='primary' onClick={handleShow}>SHOW LIST</Button>
                         </Col>

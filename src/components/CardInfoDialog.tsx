@@ -1,10 +1,16 @@
 import React from 'react';
-import {Modal,Button} from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
+import Card from '../common/Card/Card';
 
-const CardInfoDialog = (props) => {
+interface CardInfoDialogProps {
+    card: Card,
+    show: Function,
+    onHide: Function
+}
+const CardInfoDialog: React.FC<CardInfoDialogProps> = (props) => {
 
     const id = props.card;
-    const type = props.type;
+    const type = 'character';//props.card;
 
     return (
         <Modal show={props.show} onHide={props.onHide}>
@@ -15,7 +21,7 @@ const CardInfoDialog = (props) => {
                 <img src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${id}.jpg`} alt='teste'></img>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={props.onHide}>
+                <Button variant="secondary" onClick={() => props.onHide()}>
                     Close
           </Button>
             </Modal.Footer>

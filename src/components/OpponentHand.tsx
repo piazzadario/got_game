@@ -1,7 +1,10 @@
 import React from "react";
 import { Row } from "react-bootstrap";
-
-const OpponentHand = (props) => {
+import Card from "../common/Card/Card";
+interface OpponentHandProps {
+  hand: Card[]
+}
+const OpponentHand: React.FC<OpponentHandProps> = (props) => {
   return (
     <Row className="justify-content-center mb-1">
       {props.hand.map((c, idx) => (
@@ -13,9 +16,9 @@ const OpponentHand = (props) => {
           ></img>
           <p
             className="w3-badge w3-medium w3-padding w3-yellow "
-            style={{ zIndex: "3", position: "relative", right: '50%' }}
+            style={{ zIndex: 3, position: "relative", right: '50%' }}
           >
-            {idx+1}
+            {idx + 1}
           </p>
         </div>
       ))}

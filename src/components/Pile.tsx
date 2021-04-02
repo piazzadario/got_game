@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { Col, Button } from 'react-bootstrap';
+import Card from '../common/Card/Card';
 import ModalList from './ModalList';
 
-const Pile = (props) => {
+interface PileProps{
+    items:Card[],
+    listType:string
+}
+
+
+const Pile: React.FC<PileProps>  = (props) => {
 
     const items = props.items;
     const length = items.length;

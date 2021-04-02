@@ -2,17 +2,24 @@ import React, { useState } from 'react';
 import {  Button } from 'react-bootstrap';
 import '../custom.css';
 
-
-const AttachedCard = (props) => {
+interface AttachedCardProps{
+    attachmentId:number,
+    idx:number,
+    onDiscard:Function,
+    onToHand:Function,
+    onShowCardInfo:Function,
+    owner:boolean
+}
+const AttachedCard: React.FC<AttachedCardProps> = (props) => {
 
     const attachmentId = props.attachmentId;
     const [isKneed, setKneed] = useState(false);
     const idx =props.idx;
     const [attachmentVisible, setAttachmentVisible] = useState(false)
-
+    let val:number=attachmentVisible ? 999 : (20 - idx - 1)
     return (
         <div onMouseOver={() => { setAttachmentVisible(true) }} onMouseLeave={() => setAttachmentVisible(false)} onClick={() => setKneed(!isKneed)}
-            style={{ position: 'relative', marginTop: `${-110 + (idx * -1 - 1)}%`, zIndex: `${attachmentVisible ? '999' : (20 - idx - 1)}` }} >
+            style={{ position: 'relative', marginTop: `${-110 + (idx * -1 - 1)}%`, zIndex: val}} >
             <img key={idx} style={{ height: '100%', width: '100%' }}
                 className={isKneed ? 'kneed' : ''}
                 src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${attachmentId}.jpg`}

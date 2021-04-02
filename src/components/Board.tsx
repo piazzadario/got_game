@@ -17,7 +17,7 @@ import AttachmentDialog from "./AttachmentDialog";
 import API from "../api";
 import { socket } from "../common/Utility/socket";
 import SelectFaction from "./SelectFaction";
-import {HandContext} from '../provider/HandContext';
+import { HandContext } from '../provider/HandContext';
 import Deck from '../common/Deck';
 import State from "../common/State";
 import Card from "../common/Card/Card"
@@ -26,22 +26,23 @@ import PlotCard from "../common/Card/PlotCard";
 import EventCard from "../common/Card/EventCard";
 import AttachmentCard from "../common/Card/AttachmentCard";
 import CharacterCard from "../common/Card/CharacterCard";
+import DeckComponent from "./DeckComponent";
 interface IProps {
-  boardState:State;
-  owner:boolean;
+  boardState: State;
+  owner: boolean;
 }
 
 
 class Board extends React.Component<IProps, State>  {
-  constructor(props:IProps) {
+  constructor(props: IProps) {
     super(props);
     this.state = props.boardState;
   }
 
-  selectFaction = (deck:Deck ) => {
+  selectFaction = (deck: Deck) => {
     this.setState(
       {
-        deck:deck
+        deck: deck
       },
       () => socket.emit("game", this.state)
     );
@@ -57,43 +58,21 @@ class Board extends React.Component<IProps, State>  {
     }
   }
 
-  discardCard = (id:number, from:string) => {
-    if (from !== FROMARRAY.Chars) {
-      this.setState(
-        (state) => {
-          var newCard:Card=new Card(id);
-          let discarded = state.discardedCards.concat(newCard);
-          let indexOfDiscarded = state.playedCharacterCards.indexOf(newCard);
-          let newList = [...state.playedCharacterCards];
-          newList.splice(indexOfDiscarded, 1);
-          return { [from]: newList, discardedCards: discarded };
-        },
-        () => socket.emit("game", this.state)
-      );
-      //}, () => localStorage.setItem('hand', this.state.hand))
-    } else {
-      this.setState(
-        (state) => {
-          console.log(id);
-          var newCard=new Card(id);
-          let discarded = state.discardedCards.concat(newCard);
-          let indexOfDiscarded = state.playedCharacterCards.map((c) => c.id).indexOf(newCard.id);
-          let newList = [...state.playedCharacterCards];
-          newList.splice(indexOfDiscarded, 1);
-          return { playedCharacterCards: newList, discardedCards: discarded };
-        },
-        () => socket.emit("game", this.state)
-      );
-      //}, () => localStorage.setItem('hand', this.state.hand))
-    }
+  discardCard = (card: Card) => {
+    this.state.deck?.getCard(card).toDiscardPile();
+    this.setState(
+      (state) => {
+
+      },
+      () => socket.emit("game", this.state)
+    );
   };
 
-  onPlayCard = async (id:number) => {
-    let card = await API.getCardData(id);
+  onPlayCard = async (newCard: Card) => {
+    let card = await API.getCardData(card);
     if (card.type_code === TYPES.Character) {
       this.setState(
         (state) => {
-          var newCard=new Card(id);
           let newCharsList = state.playedCharacterCards.concat(newCard);
           let indexOfDiscarded = state.hand.indexOf(newCard);
           let newHand = [...state.hand];
@@ -107,7 +86,7 @@ class Board extends React.Component<IProps, State>  {
     if (card.type_code === TYPES.Location) {
       this.setState(
         (state) => {
-          var newCard=new PlaceCard(id);
+          var newCard = new PlaceCard(card);
           let newPlacesList = state.playedPlaces.concat(newCard);
           let indexOfDiscarded = state.hand.indexOf(newCard);
           let newHand = [...state.hand];
@@ -121,7 +100,7 @@ class Board extends React.Component<IProps, State>  {
     if (card.type_code === TYPES.Plot) {
       this.setState(
         (state) => {
-          var newCard=new PlotCard(id);
+          var newCard = new PlotCard(card);
           let newPastPlotsList = state.pastPlots.concat(newCard);
           let indexOfDiscarded = state.handCards.indexOf(newCard);
           let newPlotsHand = [...state.handCards];
@@ -135,7 +114,7 @@ class Board extends React.Component<IProps, State>  {
     if (card.type_code === TYPES.Event) {
       this.setState(
         {
-          eventDialogCard: new EventCard(id),
+          eventDialogCard: new EventCard(card),
         },
         () => socket.emit("game", this.state)
       );
@@ -144,7 +123,7 @@ class Board extends React.Component<IProps, State>  {
     if (card.type_code === TYPES.Attachment) {
       this.setState(
         {
-          attachmentCard: new AttachmentCard(id),
+          attachmentCard: new AttachmentCard(card),
         },
         () => socket.emit("game", this.state)
       );
@@ -152,99 +131,72 @@ class Board extends React.Component<IProps, State>  {
     }
   };
 
-  killChar = (id:number) => {
+  killChar = (card: Card) => {
+    this.state.deck?.getCard(card.id).toDeadPile();
     this.setState(
       (state) => {
-        let deads = state.deadCards.concat(new Card(id));
-        let indexOfKilled = state.playedCharacterCards.map((c) => c.id).indexOf(id);
-        let newChars = [...state.playedCharacterCards];
-        newChars.splice(indexOfKilled, 1);
-        return { playedCharacterCards: newChars, deadCards: deads };
       },
       () => socket.emit("game", this.state)
     );
-    //})
-  };
-  returnToHand = (id:number, from:string) => {
-    this.setState(
-      (state) => {
-        let newHand = state.hand.concat(new Card(id));
-        let indexOfReturned =
-          from === FROMARRAY.Chars
-            ? state.playedCharacterCards.map((c) => c.id).indexOf(id)
-            : state[from].indexOf(id);
-        let newList = [...state[from]];
-        newList.splice(indexOfReturned, 1);
-        return { [from]: newList, handCards: newHand };
-      },
-      () => socket.emit("game", this.state)
-    );
-    //}, () => localStorage.setItem('hand', this.state.hand))
   };
 
-  returnToDeck = (id:number) => {
+
+  returnToHand = (card: Card) => {
     this.setState(
       (state) => {
-        var newCard=new Card(id);
-        let newDeck = state.coverDeck.concat(newCard);
-        let indexOfDiscarded = state.hand.indexOf(newCard);
-        let newHand = [...state.hand];
-        newHand.splice(indexOfDiscarded, 1);
-        return { handCards: newHand, deck: newDeck };
+        let newState: State = state;
+        newState.deck?.getCard(card.id).toHand();
+        return { ...newState };
       },
       () => socket.emit("game", this.state)
     );
-    //}, () => localStorage.setItem('hand', this.state.hand))
+  };
+
+  returnToDeck = (card: Card) => {
+    this.setState(
+      (state) => {
+        let newState: State = state;
+        newState.deck?.getCard(card.id).toDeck();
+        return { ...newState };
+      },
+      () => socket.emit("game", this.state)
+    );
   };
 
   addCard = () => {
+    let id = 1;
     this.setState(
       (state) => {
-        let id = state.handCards.length + 1;
-        const cardsList = state.handCards.concat(new Card(id));
-        return { handCards: cardsList };
+        let newState: State = state;
+        newState.deck?.getCard(id).toHand();
+        return { ...newState };
       },
       () => socket.emit("game", this.state)
     );
-    //}, () => localStorage.setItem('hand', this.state.hand));
   };
 
-  drawCard = () => {
-    this.setState(
-      (state) => {
-        let tmpDeck = [...state.deck];
-        let drawnCard = tmpDeck.pop();
-        let newHand = state.hand.concat(drawnCard);
-        console.log(state.deck.length, tmpDeck.length);
-        return { hand: newHand, deck: tmpDeck };
-      },
-      () => socket.emit("game", this.state)
-    );
-    //}, () => localStorage.setItem('hand', this.state.hand))
+
+  handleEventCard = (card: Card) => {
+    this.state.deck?.getCard(card.id).toDiscardPile();
+    this.setState({ eventDialogCard: card });
   };
 
-  handleEventCard = (id:number) => {
-    this.discardCard(id, FROMARRAY.Hand);
-    this.setState({ eventDialogCard: null });
-  };
-
-  setGoldPow = (gold:number, pow:number) => {
-    console.log(gold, pow);
+  setGoldPow = (gold: number, pow: number) => {
     this.setState({ gold: gold, power: pow }, () =>
       socket.emit("game", this.state)
     );
   };
 
-  attachmentAction = (attachmentId:number, charId:number, action) => {
+  attachmentAction = (attachmentId: number, charId: number, action) => {
     this.setState(
       (state) => {
         // update status of characters
         let indexOfChar = state.playedCharacterCards.map((c) => c.id).indexOf(charId);
-        let characters:CharacterCard = state.playedCharacterCards.find((c) => c.id === charId);
+        let characters: CharacterCard = state.playedCharacterCards.find((c) => c.id === charId);
         let newAttachmentsList = [...characters.attachments].filter(
           (a) => a !== attachmentId
         );
-        let newChars:Array<CharacterCard> = [...state.playedCharacterCards];
+        let newChars: Array<CharacterCard> = [...state.playedCharacterCards];
         newChars[indexOfChar].attachments = newAttachmentsList;
 
         // update hand/discarded
@@ -262,22 +214,12 @@ class Board extends React.Component<IProps, State>  {
     //})
   };
 
-  addCardToHand = (id:Card) => {
-    this.setState(
-      (state) => {
-        let newHand = state.hand.concat(id);
-        return { hand: newHand };
-      },
-      () => socket.emit("game", this.state)
-    );
-    //}, () => localStorage.setItem('hand', this.state.hand))
+
+  showCardInfo = (card: Card) => {
+    this.setState({ infoCard: card });
   };
 
-  showCardInfo = (id:Card) => {
-    this.setState({ infoCard: id });
-  };
-
-  handleAttachmentDialog = (attachmentId:AttachmentCard, targetId:Card) => {
+  handleAttachmentDialog = (attachmentId: AttachmentCard, targetId: Card) => {
     const attachmentCard = this.state.attachmentCard;
     if (!targetId) {
       this.setState({ attachmentCard: null });
@@ -303,100 +245,92 @@ class Board extends React.Component<IProps, State>  {
     }
   };
 
-  returnToPlots = (id) => {
-    this.setState(state => {
-      let newPlotsHand = state.handCards.concat(id);
-      let indexOfReturned = state.pastPlots.indexOf(id);
-      let newList = [...state.pastPlots];
-      newList.splice(indexOfReturned, 1)
-      return { pastPlots: newList, handCards: newPlotsHand }
-    })
-  }
 
   shuffleHand = () => {
     this.setState({ hand: shuffle(this.state.hand) }/* , () => localStorage.setItem('hand', this.state.hand) */)
   }
 
   render() {
-    if (!this.state.faction) {
+    if (!this.state.deck) {
       if (!this.props.owner) {
-        return <p>Waiting for opponent...</p>;
+        return <Row>"Waiting for opponent.." </Row>;
       } else {
         return <SelectFaction onSelectFaction={this.selectFaction} />;
       }
     } else {
       const value = {
-        hand: this.state.hand,
+        hand: this.state.deck.getHand(),
         returnToHand: this.returnToHand,
         playPlot: this.onPlayCard,
         addAttachment: this.handleAttachmentDialog,
-        returnToPlots: this.returnToPlots
-  
+        returnToPlots: this.returnToDeck
+
       }
       return (
-        <HandContext.Provider value={value}>
+        <HandContext.Provider value={value} >
           <Row>
             <Col sm={8}>
               <Row>
-                {this.state.chars.map((c) => (
-                  <PlayedCard
-                    card={c}
-                    key={c.charId}
-                    owner={this.props.owner}
-                    onDiscard={() =>
-                      this.discardCard(c.charId, FROMARRAY.Chars)
-                    }
-                    onKill={() => this.killChar(c.charId)}
-                    onShowCardInfo={this.showCardInfo}
-                    isChar={true}
-                    onReturnToHand={() =>
-                      this.returnToHand(c.charId, FROMARRAY.Chars)
-                    }
-                    handleAttachment={this.attachmentAction}
-                  ></PlayedCard>
-                ))}
-              </Row>
-              <Row>
-                {this.state.places.map((c) => (
-                  <PlayedCard
-                    card={c}
-                    key={c}
-                    isChar={false}
-                    onDiscard={() => this.discardCard(c, FROMARRAY.Places)}
-                    onShowCardInfo={this.showCardInfo}
-                    onReturnToHand={() =>
-                      this.returnToHand(c, FROMARRAY.Places)
-                    }
-                  ></PlayedCard>
-                ))}
-              </Row>
-            </Col>
+                {
+                  this.state.deck.getPlayed().map((c) => (
+                    <PlayedCard
+                      card={c}
+                      key={c.id}
+                      owner={this.props.owner}
+                      onDiscard={() =>
+                        this.discardCard(c)
+                      }
+                      onKill={() => this.killChar(c)
+                      }
+                      onShowCardInfo={this.showCardInfo}
+                      onReturnToHand={() =>
+                        this.returnToHand(c)
+                      }
+                      handleAttachment={this.attachmentAction}
+                    > </PlayedCard>
+                  ))
+                }</Row>
+              < Row >
+                {
+                  this.state.deck.getPlayed().map((c) => (
+                    <PlayedCard
+                      card={c}
+                      key={c}
+                      isChar={false}
+                      onDiscard={() => this.discardCard(c)}
+                      onShowCardInfo={this.showCardInfo}
+                      onReturnToHand={() =>
+                        this.returnToHand(c)
+                      }
+                    > </PlayedCard>
+                  ))}
+              </Row> </Col>
 
-            <Col sm={4}>
-              <Row className="mb-3">
+            < Col sm={4} >
+              <Row className="mb-3" >
                 <FactionCard
-                  faction={this.state.faction}
+                  faction={this.state.deck.factionName}
                   owner={this.props.owner}
-                  hand={this.state.hand.length}
+                  hand={this.state.deck.getHand().length}
                   gold={this.state.gold}
                   power={this.state.power}
                   setGoldPow={this.setGoldPow}
                 />
-                <Pile items={this.state.pastPlots} listType={"Past plots"} />
+                <Pile items={this.state.deck.getPastPlots()} listType={"Past plots"} />
               </Row>
-              <Row sm={6}>
-                <Deck
+              < Row sm={6} >
+                <DeckComponent
                   owner={this.props.owner}
-                  cards={this.state.deck}
+                  cards={this.state.deck.getInDeck()}
                   drawCard={() => this.drawCard()}
                   shuffle={() =>
                     this.setState({ deck: shuffle(this.state.deck) })
                   }
-                ></Deck>
-                <Pile items={this.state.discardedList} listType={"Discarded"} />
-                <Pile items={this.state.deadList} listType={"Dead"}></Pile>
+                > </DeckComponent>
+                < Pile items={this.state.discardedList} listType={"Discarded"} />
+                <Pile items={this.state.deadList} listType={"Dead"} > </Pile>
               </Row>
-              <Col hidden={!this.props.owner} className="mt-2">
+              < Col hidden={!this.props.owner} className="mt-2" >
                 <Row
                   className="align-items-center mb-1"
                   style={{
@@ -408,56 +342,56 @@ class Board extends React.Component<IProps, State>  {
                     <Button
                       variant="info"
                       onClick={() => this.shuffleHand()}
-                    >{`SHUFFLE (${this.state.hand.length})`}</Button>
+                    > {`SHUFFLE (${this.state.hand.length})`}</Button>
                   </Col>
-                  <Col>
+                  < Col >
                     <Button
                       variant="secondary"
                       onClick={() => {
                         localStorage.setItem("hand", this.state.hand);
                         window.open("/hand");
                       }}
-                    >{`SHOW (${this.state.hand.length})`}</Button>
+                    > {`SHOW (${this.state.hand.length})`}</Button>
                   </Col>
-                  <AddCardForm onAddPressed={this.addCardToHand} />
+                  < AddCardForm onAddPressed={this.addCardToHand} />
                 </Row>
-              </Col>
-            </Col>
+              </Col>    </Col>
           </Row>
 
-          <Row hidden={!this.props.owner}>
+          < Row hidden={!this.props.owner}>
             <Col sm={7}>
-              <Row className="px-3">
-                {this.state.hand.map((c, idx) => (
-                  <Col className="handCard p-0" sm={2} key={c}>
-                    <HandCard
-                      id={c}
-                      idx={idx + 1}
-                      hidden={!this.props.owner}
-                      onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
-                      onPlayCard={() => this.onPlayCard(c)}
-                      onReturnToDeck={() => this.returnToDeck(c)}
-                      onShowInfo={()=>this.showCardInfo(c)}
-                    ></HandCard>
-                  </Col>
-                ))}
+              <Row className="px-3" >
+                {
+                  this.state.hand.map((c, idx) => (
+                    <Col className="handCard p-0" sm={2} key={c} >
+                      <HandCard
+                        id={c}
+                        idx={idx + 1}
+                        hidden={!this.props.owner}
+                        onDiscard={() => this.discardCard(c, FROMARRAY.Hand)}
+                        onPlayCard={() => this.onPlayCard(c)}
+                        onReturnToDeck={() => this.returnToDeck(c)}
+                        onShowInfo={() => this.showCardInfo(c)}
+                      > </HandCard>
+                    </Col>
+                  ))}
               </Row>
-            </Col>
-            <Pile items={this.state.plotsHand} listType={"Plots"} />
+            </Col >
+            < Pile items={this.state.plotsHand} listType={"Plots"} />
           </Row>
-          <CardInfoDialog
+          < CardInfoDialog
             card={this.state.eventDialogCard}
             show={this.state.eventDialogCard !== null}
             type={"Event"}
             onHide={() => this.handleEventCard(this.state.eventDialogCard)}
           />
-          <CardInfoDialog
+          < CardInfoDialog
             card={this.state.infoCard}
             show={this.state.infoCard !== null}
             type={"Card"}
             onHide={() => this.showCardInfo(null)}
           />
-          <AttachmentDialog
+          < AttachmentDialog
             charactersList={this.state.chars}
             attachment={this.state.attachmentCard}
             onAttach={this.handleAttachmentDialog}

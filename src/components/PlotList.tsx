@@ -1,8 +1,14 @@
-import React,{useState} from 'react';
-import { Col,Button } from 'react-bootstrap';
+import { Interface } from 'node:readline';
+import React, { useState } from 'react';
+import { Col, Button } from 'react-bootstrap';
+import Card from '../common/Card/Card';
 import ModalList from './ModalList';
 
-const PlotList = (props) => {
+interface PlotListProps {
+    items: Card[],
+}
+
+const PlotList: React.FC<PlotListProps> = (props) => {
 
     const items = props.items;
     const length = items.length;
@@ -17,12 +23,12 @@ const PlotList = (props) => {
     return (
         <>
             {length > 0 ?
-                <div className='m-1' style={{position:'relative'}}>
+                <div className='m-1' style={{ position: 'relative' }}>
                     <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${lastid}.jpg`} alt='teste'>
 
                     </img>
-                    <p className="w3-badge w3-large w3-padding w3-blue"  style={{ position: 'absolute',right:'15%', zIndex: '3' }}>{length}</p> 
-                    {items.length > 0 && <Col style={{ position: 'absolute', top: '10%', left: '10%', zIndex: '3', width: '100%' }}>
+                    <p className="w3-badge w3-large w3-padding w3-blue" style={{ position: 'absolute', right: '15%', zIndex: 3 }}>{length}</p>
+                    {items.length > 0 && <Col style={{ position: 'absolute', top: '10%', left: '10%', zIndex: 3, width: '100%' }}>
                         <Col >
                             <Button variant='primary' onClick={handleShow}>SHOW LIST</Button>
                         </Col>
