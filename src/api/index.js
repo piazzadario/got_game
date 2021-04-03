@@ -1,6 +1,5 @@
 
 // https://thronesdb.com/ 
-const herokuUrl = 'https://got-up.herokuapp.com'
 const cardUrl = 'https://thronesdb.com/api/public/card/';
 
 const getCardData = async function(id) {
@@ -10,8 +9,8 @@ const getCardData = async function(id) {
     if(parseInt(cardId) < 10){
         cardId = '00'+cardId
     }else if(parseInt(cardId) < 100) cardId = '0'+cardId
-    // console.log(setId,cardId)
-    let url  =herokuUrl+cardUrl+setId+cardId;
+    console.log(setId,cardId)
+    let url  =cardUrl+setId+cardId;
     const response = await fetch(url);
     const jsonResponse= await response.json();
     if(response.ok) return jsonResponse;
