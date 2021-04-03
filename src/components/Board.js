@@ -290,10 +290,10 @@ class Board extends React.Component {
       let targetIndex = chars.map((c) => c.id).indexOf(targetId);
       // console.log(targetIndex)
       if (!chars[targetIndex].attachments) {
-        chars[targetIndex].attachments = [attachmentCard];
+        chars[targetIndex].attachments = [{id: attachmentCard, isKneed: false}];
       } else {
         let newAttachmentsList = chars[targetIndex].attachments.concat(
-          attachmentCard
+          {id: attachmentCard, isKneed: false}
         );
         chars[targetIndex].attachments = newAttachmentsList;
       }
@@ -318,6 +318,7 @@ class Board extends React.Component {
   }
 
   kneeCard = (id,from, attachedTo=null) => {
+    console.log(id,from,attachedTo)
     // if is not an attachment, it's a place or a character
     if(!attachedTo){
       this.setState(state =>{
@@ -330,20 +331,21 @@ class Board extends React.Component {
         newArray[indexOftarget] = updatedCard;
         console.log(newArray)
         console.log('NewState: ',newState)
-        // console.log(newArray)
         return {[from]: newArray}
       },() => socket.emit("game", this.state))
     }else{
+      // it's attached to a character
       this.setState(state =>{
-        let indexOftarget = state[from].map(card => card.id).indexOf(attachedTo);
+        let indexOfChar = state[from].map(card => card.id).indexOf(attachedTo);
         let newArray = [...state[from]];
-        let newState = !(state[from][indexOftarget].isKneed);
-        let updatedCard  = {...newArray[indexOftarget]};
-        updatedCard.isKneed = newState;
-        newArray[indexOftarget] = updatedCard;
-        console.log(newArray)
-        console.log('NewState: ',newState)
-        // console.log(newArray)
+        let newAttachmentsList = [...state[from][indexOfChar].attachments] // copies the old list of attachments
+        let indexOfAttachment = newAttachmentsList.map(a => a.id).indexOf(id)
+        let newAttachment= {...newAttachmentsList[indexOfAttachment]}
+        newAttachment.isKneed = !newAttachment.isKneed
+        newAttachmentsList[indexOfAttachment]=newAttachment
+        let newChar = {...newArray[indexOfChar]}
+        newChar.attachments = newAttachmentsList;
+        newArray[indexOfChar] = newChar
         return {[from]: newArray}
       },() => socket.emit("game", this.state))
     }

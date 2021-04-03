@@ -3,7 +3,7 @@ import { Form, Col, Row, Button } from 'react-bootstrap';
 
 const AddCardForm = (props) => {
 
-    const [cardId,setCardId] = useState(0);
+    const [cardId,setCardId] = useState("01_001");
 
 
     return (
@@ -13,7 +13,7 @@ const AddCardForm = (props) => {
                     <Col>
                         <Form.Group >
                             <Form.Label>Add a card to hand:</Form.Label>
-                            <Form.Control type='number' placeholder="ex. 167" value={cardId} onChange={(ev)=>setCardId(ev.target.value)} />
+                            <Form.Control  pattern={'^[0-9]{2}_[0-9]+$'} placeholder="ex. 01_12" value={cardId} onChange={(ev)=>setCardId(ev.target.value)} />
                         </Form.Group>
                     </Col>
                         <Button variant="primary m-2" onClick={()=>{props.onAddPressed(cardId); setCardId(0)}}>ADD</Button>

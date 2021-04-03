@@ -20,9 +20,7 @@ const PlayedCard = (props) => {
     const attachmentList = isChar? card.attachments : [];
     // const [isKneed, setKneed] = useState(false);
     const [isMenuVisible, setVisible] = useState(false);
-    // const [powerPoints, setPower] = useState(0);
-    console.log(id);
-    
+    // const [powerPoints, setPower] = useState(0);    
 
     return (
         
@@ -44,13 +42,13 @@ const PlayedCard = (props) => {
                 }
             </div>
 
-            {attachmentList.map((a, idx) =>
-                <AttachedCard attachmentId={a} key={a} idx={idx}
-                    onKnee = {()=>props.onKnee(a,from,id)}
+            {attachmentList.map((att, idx) =>
+                <AttachedCard attachment={att} key={`attachment_${idx}`} idx={idx}
+                    onKnee = {()=>props.onKnee(att.id,from,id)}
                     owner={props.owner}
                     onShowCardInfo={props.onShowCardInfo}
-                    onDiscard={() => props.handleAttachment(a, id, AttachmentAction.Discard)}
-                    onToHand={() => props.handleAttachment(a, id, AttachmentAction.ToHand)} />
+                    onDiscard={() => props.handleAttachment(att.id, id, AttachmentAction.Discard)}
+                    onToHand={() => props.handleAttachment(att.id, id, AttachmentAction.ToHand)} />
             )
 
             }
