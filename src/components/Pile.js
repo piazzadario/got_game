@@ -20,7 +20,7 @@ const Pile = (props) => {
         <Col className='pile-card' sm={listType==='Plots' ? 2: (listType==='Past plots'? 5: 4)} >
             {length > 0 ?
                 <div className='m-1 px-1' style={{position:'relative',width:'100%'}}>
-                    <img style={{width: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${lastid}.jpg`} alt='teste'>
+                    <img style={{width: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT${lastid}.jpg`} alt='teste'>
 
                     </img>
                     <p className="w3-badge w3-large w3-padding w3-blue pile-counter" >{length}</p>

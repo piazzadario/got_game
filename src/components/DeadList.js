@@ -18,7 +18,7 @@ const DeadList = (props) => {
         <>
             {length !== 0 ?
                 <div className='m-1'>
-                    <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${lastid}.jpg`} alt='teste'>
+                    <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT${lastid}.jpg`} alt='teste'>
 
                     </img>
                     <Badge style={{ position: 'absolute', top: '0', right: '0' }} variant='secondary' >{length}</Badge>

@@ -18,7 +18,7 @@ const PlotList = (props) => {
         <>
             {length > 0 ?
                 <div className='m-1' style={{position:'relative'}}>
-                    <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT01_${lastid}.jpg`} alt='teste'>
+                    <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={`https://lcg-cdn.fantasyflightgames.com/got2nd/GT${lastid}.jpg`} alt='teste'>
 
                     </img>
                     <p className="w3-badge w3-large w3-padding w3-blue"  style={{ position: 'absolute',right:'15%', zIndex: '3' }}>{length}</p> 
