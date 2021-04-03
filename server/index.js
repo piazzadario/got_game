@@ -15,11 +15,6 @@ const io  = socket(server,{
 io.on('connection', (socket) => {
     console.log('a user connected: ID = ',socket.id);
 
-    socket.on('message', (message) =>     {
-        // console.log(message);
-        io.emit('message', `${socket.id.substr(0,2)} said ${message}` );   
-    });
-
     socket.on('faction_selection', (faction) =>     {
         socket.broadcast.emit('faction_selection', faction );   
     });
@@ -28,5 +23,10 @@ io.on('connection', (socket) => {
         // console.log(gameState);
         socket.broadcast.emit('game', gameState );   
     });
+
+    socket.on('disconnect', function() {
+        console.log("Client disconnected: ", socket.id)
+    })
+
 });
 
