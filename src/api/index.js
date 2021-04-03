@@ -1,6 +1,6 @@
 
 // https://thronesdb.com/ 
-const herokuUrl = 'https://got-up.herokuapp.com/'
+const herokuUrl = 'https://got-up.herokuapp.com'
 const cardUrl = 'https://thronesdb.com/api/public/card/';
 
 const getCardData = async function(id) {
